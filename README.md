@@ -53,3 +53,9 @@ npm test
 See [MAC-SETUP.txt](login-demo/MAC-SETUP.txt), [PRESENTATION.txt](login-demo/PRESENTATION.txt), [SOURCES.txt](login-demo/SOURCES.txt), and [VALIDATION.txt](login-demo/VALIDATION.txt).
 
 Use invented data only. Tokens are visible in localStorage for this lesson, so this is a classroom demo rather than a production session template. Never commit live tokens, secret keys, passwords, or storage dumps. Google sign-in is an explanatory diagram, not a live integration.
+
+Local public configuration can also be loaded from an ignored
+`login-demo/connection.local.json` file. It uses the exported settings format
+and never includes a password or session. The current presenter's test project
+has its schema, confirmed demo users, and sample reports installed.
+Do not rerun the fresh SQL setup against an already configured project.

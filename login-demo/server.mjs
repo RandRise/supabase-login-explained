@@ -3,8 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 const dir = dirname(fileURLToPath(import.meta.url));
-const files = new Map([['/','index.html'],['/app.js','app.js'],['/core.mjs','core.mjs'],['/style.css','style.css'],['/setup.sql','setup.sql'],['/add-report-action.sql','add-report-action.sql']]);
-const mime = {html:'text/html',js:'text/javascript',mjs:'text/javascript',css:'text/css',sql:'text/plain'};
+const files = new Map([['/','index.html'],['/app.js','app.js'],['/core.mjs','core.mjs'],['/style.css','style.css'],['/setup.sql','setup.sql'],['/add-report-action.sql','add-report-action.sql'],['/connection.public.json','connection.local.json']]);
+const mime = {html:'text/html',js:'text/javascript',mjs:'text/javascript',css:'text/css',sql:'text/plain',json:'application/json'};
 export function createStaticServer() {
   return createServer(async (req,res)=>{
     const host = req.headers.host || '';
@@ -21,7 +21,7 @@ export function createStaticServer() {
         'Referrer-Policy':'no-referrer',
         'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
       });res.end(req.method === 'HEAD' ? undefined : bytes);
-    }catch{res.writeHead(500);res.end('File unavailable');}
+    }catch(e){res.writeHead(e.code === 'ENOENT' ? 404 : 500);res.end('File unavailable');}
   });
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

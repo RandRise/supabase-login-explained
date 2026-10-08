@@ -4,11 +4,11 @@ PASSED
 - JavaScript module syntax checks.
 - 40 Node built-in checks: JWT decoder, config safety, owner-report validation,
   evidence classification, static routing and security headers.
-- 42 isolated DOM checks: signed-out/in UI, collapsed tools, no speaking notes,
+- 45 isolated DOM checks: signed-out/in UI, collapsed tools, no speaking notes,
   password clearing, authenticated report request/download, omitted bearer for
   anonymous requests, 401 denial, 404/500 inconclusive results, wrong-owner
   refusal, copied-token replay after logout, Bob baseline, tampering tests,
-  public-settings export/import, refusal of token-bearing imports, session restoration and a late-response/logout race.
+  public-settings export/import, refusal of token-bearing imports, session restoration, local public-settings bootstrap and a late-response/logout race.
 - 19 local PostgreSQL checks using PGlite: execute setup.sql, execute the upgrade
   script, anonymous RPC raises 42501, Alice/Bob own report only, direct SELECT
   obeys RLS, Alice cannot SELECT Bob's note, anonymous SELECT returns zero rows,
@@ -24,14 +24,22 @@ Test-only jsdom/PGlite packages are in the ignored .qa folder; they are not
 included in the app, repository or ZIP. npm test requires no dependencies.
 No simulated auth mode or local credential handler was added to the app.
 
+LIVE SUPABASE CHECKS — 8 OCTOBER 2026
+- Connected to the new login-explained-demo test project.
+- Applied the isolated notes table, RLS owner policy, grants and invoker report
+  function. Both demo accounts are confirmed and each has one seeded note; no shared app modified.
+- Real POST to report RPC with publishable key and NO Authorization header:
+  HTTP 401, SQLSTATE 42501, "Sign in to download your private report."
+- Real anonymous SELECT on notes: HTTP 200, zero rows (different from denial).
+- Database inspection confirms RLS, auth.uid() owner rule, SECURITY INVOKER and
+  empty function search_path. Security advisor returned no notices.
+- No live password login, authenticated download, refresh, tampering or copied
+  token replay is claimed yet: these require signing in with the demo passwords.
+
 STILL REQUIRED BEFORE THE PRESENTATION
-- Create/choose the Supabase project: the connected account currently has none.
-- Create/confirm two test users and execute setup.sql (or the upgrade script if
-  you already configured the original app yourself).
-- Configure URL/public key. Confirm Alice's real download returns HTTP 200 and
-  the anonymous request returns HTTP 401 with the report's sign-in message.
-- Confirm Bob's baseline, actual signature rejection and owner-only access.
-- Rehearse the captured-token replay and explain its actual response.
+- Schema and seed notes are ALREADY installed in this project. Do not rerun setup.sql or add-report-action.sql here.
+- Confirm Alice's real download HTTP 200 and Bob's baseline.
+- Confirm actual signature rejection, owner-only access and copied-token replay.
 - Review layout/downloads in a graphical browser and run on the actual Mac.
 
 Browser automation was unavailable: its runtime exited before opening a

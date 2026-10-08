@@ -147,3 +147,12 @@ window.addEventListener('storage',e=>{
 $('#project-url').value=config?.url||'';$('#public-key').value=config?.key||'';
 $('#restore-state').textContent=restored?'Session restored from localStorage on this page load. Report access still requires a new Supabase check.':'No saved session was loaded on this page.';
 render();setInterval(tick,1000);if(!config)notice('Connect your Supabase test project in Connection settings to get started.');
+// Optional machine-local public settings. Never bootstrap a password or session.
+async function loadLocalConnection(){
+ if(config)return;
+ try{const r=await fetch('/connection.public.json',{credentials:'omit'});if(!r.ok)return;const data=await r.json();
+ if(config||busy||data.format!=='folio-public-connection-v1'||Object.keys(data).some(k=>!['format','url','key'].includes(k)))return;
+ connect(validateConfig(data.url,data.key));notice('Test project connected. Sign in to access your report.');
+ }catch{/* A clone without local settings uses the normal connection dialog. */}
+}
+loadLocalConnection();

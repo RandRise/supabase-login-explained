@@ -12,4 +12,4 @@ them on the Mac, then sign in again. No need to recreate the Supabase project.
 
 If you already set up the earlier version, run add-report-action.sql once in
 the same project's SQL Editor. For a fresh project use setup.sql instead.
-We'll still need to finish the real Supabase setup and rehearse before class.
+The real Supabase setup is ready. We still need to rehearse signing in and downloading the report before class.

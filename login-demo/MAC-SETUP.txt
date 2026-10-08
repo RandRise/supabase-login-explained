@@ -37,3 +37,10 @@ UPDATES LATER
 Stop the server with Ctrl+C. From the repository folder, run git pull, then
 start it again. If you made your own source edits, inspect them before pulling;
 do not reset or discard files blindly.
+
+Optional local setup: a presenter may keep login-demo/connection.local.json
+with the same format as the exported public-settings file. The server exposes
+it as /connection.public.json, and the app uses it only when this browser has
+no saved connection. It must contain only format, url and a publishable key.
+The file is ignored by Git. This laptop has one; a fresh clone can use Import
+settings. It never transfers a password or an authenticated session.
