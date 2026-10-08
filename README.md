@@ -59,3 +59,28 @@ Local public configuration can also be loaded from an ignored
 and never includes a password or session. The current presenter's test project
 has its schema, confirmed demo users, and sample reports installed.
 Do not rerun the fresh SQL setup against an already configured project.
+
+## Code layout
+
+`app.js` is the entry point. It imports named functions, connects them to the
+page controls, and initializes the page. Business logic lives in these files:
+
+| File | Responsibility |
+| --- | --- |
+| `login-demo/js/constants.js` | Storage keys, API paths, filenames, limits and timers |
+| `login-demo/js/state.js` | Browser state, storage helpers and session validation |
+| `login-demo/js/api.js` | Supabase REST requests and response errors |
+| `login-demo/js/auth.js` | Sign in, sign out, refresh and applying a session |
+| `login-demo/js/reports.js` | Downloading a report and requesting it without a token |
+| `login-demo/js/token-lab.js` | Captured-token replay, Bob's baseline and evidence checks |
+| `login-demo/js/settings.js` | Connection settings, import/export and changes from another tab |
+| `login-demo/js/ui.js` | DOM rendering, notices, button bindings and request activity |
+| `login-demo/core.mjs` | Pure JWT, public-config and evidence helpers |
+| `login-demo/server-config.mjs` | Server port, allowed file paths, MIME types and headers |
+| `login-demo/server.mjs` | Static-file server startup and request handling |
+
+The browser loads standard JavaScript modules directly. There is no build step
+or production dependency installation. `.editorconfig` and `.prettierrc.json`
+set the formatting style: two-space indentation and readable line lengths.
+Functions are separated by blank lines; HTML and CSS are formatted as well.
+Saved sessions and previously exported public settings remain compatible.

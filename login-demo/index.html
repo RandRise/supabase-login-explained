@@ -1,21 +1,280 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Private Reports · Login demo</title><link rel="stylesheet" href="/style.css"><script type="module" src="/app.js"></script></head>
-<body>
-<header class="topbar"><a class="brand" href="/" aria-label="Private Reports home"><span class="logo" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span> Private Reports</a><div class="header-actions"><span id="connection" class="connection">Not configured</span><button id="setup-open" class="quiet" type="button">Connection settings</button><button id="logout" class="quiet" type="button" hidden>Sign out</button></div></header>
-<main>
-<div id="notice" role="status" aria-live="polite" hidden></div>
-<section id="login-view" class="login-layout">
-<div class="intro"><span class="eyebrow">YOUR WORK, IN ONE PLACE</span><h1>A private space.<br>A simple sign-in.</h1><p>Sign in to access your reports and download a copy whenever you need it.</p><div class="preview-card" aria-hidden="true"><span class="file-icon">↗</span><div><strong>Your private report</strong><span>Available to your account</span></div><span class="mini-lock">▣</span></div><p class="small">Course demo · Invented accounts and reports</p></div>
-<div class="card login-card"><span class="eyebrow">WELCOME BACK</span><h2>Sign in to Private Reports</h2><p class="muted">Use your account email and password.</p><form id="login-form"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" placeholder="alice@test.invalid" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button id="sign-in" class="primary" type="submit">Sign in <span>→</span></button></form><p class="small">Your password is checked by Supabase over HTTPS.</p></div>
-</section>
-<section id="dashboard" hidden><div class="welcome"><div><span class="eyebrow">YOUR ACCOUNT</span><h1>Welcome back.</h1><p id="identity" class="muted"></p></div><span class="badge">Signed in</span></div><article class="card report-card"><div class="report-art" aria-hidden="true"><div class="paper"><i></i><i></i><i></i><div class="paper-chart"><b></b><b></b><b></b><b></b></div></div></div><div class="report-copy"><span class="eyebrow">PRIVATE DOCUMENT</span><h2>Your account report</h2><p>Download the report belonging to your account. Access is checked each time you request it.</p><button id="download" class="primary" type="button">Download my report <span>↓</span></button><p id="download-status" class="small" role="status">Ready when you are.</p></div></article><div id="report-preview" class="card" hidden><h3>Report received</h3><p class="small">Invented data returned by Supabase for this account.</p><pre id="report-json"></pre></div></section>
-<section class="lab"><details id="session-details"><summary>Session & access tools <span>Inspect the requests behind this page</span></summary><div class="lab-body"><div class="lab-grid"><section><h3>Current session</h3><p id="restore-state" class="small"></p><p class="small">Access token expires in <strong id="timer">—</strong>. The API checks its actual expiry.</p><div class="buttons"><button id="refresh" type="button">Refresh session</button><button id="reload-page" type="button">Reload page</button></div><div class="tabs" role="group" aria-label="JWT section"><button data-part="header" type="button">Header</button><button data-part="payload" type="button" class="active">Payload</button><button data-part="signature" type="button">Signature</button></div><pre id="decoded">Sign in to inspect the token.</pre><p id="part-note" class="small">Decoding reads the claims. It does not verify the signature.</p><details><summary>Reveal access token</summary><p class="small">Treat it like a credential. Reveal only a test account token; avoid sharing recordings of the full value.</p><textarea id="raw-token" readonly aria-label="Access token" spellcheck="false"></textarea></details><p class="small">DevTools → Application (Chrome) or Storage (Firefox) → Local Storage → this site → <code>team3-supabase-session-v1</code>. Safari: enable developer features in Settings → Advanced, then inspect Storage. This teaching app stores its token pair in localStorage.</p></section>
-<section><h3>Test the protected action</h3><p class="small">These buttons call the same report endpoint. They do not change the access rules.</p><button id="anonymous" type="button">Request report without a token</button><div id="anonymous-result" class="result" role="status">No request sent yet.</div><div class="divider"></div><h3>Try a copied token</h3><p class="small">Capture while signed in, sign out, then replay. The copy stays in page memory only; reloading clears it.</p><div class="buttons"><button id="capture" type="button">Capture token</button><button id="replay" type="button">Replay copied token</button><button id="clear-capture" type="button" class="quiet">Clear copy</button></div><div id="replay-state" class="result" role="status">No copy captured.</div><p class="small">Logout revokes refresh access. An existing access JWT may still be accepted until expiry. Read the actual response.</p><button id="tests" type="button">Check token tampering & owner access</button><div id="test-results" aria-live="polite"></div></section></div>
-<details class="subsection"><summary>Verify the second account</summary><p class="small">Before testing Alice’s access to Bob’s note, confirm Bob can read that note himself. His token is never stored.</p><form id="baseline-form" class="inline-form"><label for="bob-password">Bob’s password</label><input id="bob-password" type="password" autocomplete="off" required><button type="submit">Verify Bob’s note</button></form><p id="baseline-status" class="small"></p></details>
-<details class="subsection"><summary>How Google sign-in works (diagram)</summary><ol class="oauth"><li>The app starts a PKCE flow with Supabase.</li><li>Supabase redirects to Google. A Google password is entered only on Google’s page.</li><li>Google returns a provider authorization code to Supabase.</li><li>Supabase exchanges that code with Google using its server-side client configuration.</li><li>Supabase sends a separate auth code back to the app.</li><li>The app exchanges that code with its PKCE verifier for a Supabase session.</li></ol><p class="small">No live Google integration is configured here. The site does not receive your Google password.</p></details>
-<details class="subsection"><summary>Request activity</summary><div class="buttons"><button id="clear-log" type="button" class="quiet">Clear activity</button></div><ol id="trail" class="trail"><li>No requests yet. Token and password values are omitted.</li></ol></details></div></details></section>
-<footer>Private Reports · Supabase login demo<span>Made for the Mayerfeld Practicum</span></footer>
-</main>
-<dialog id="setup"><div class="dialog-heading"><div><span class="eyebrow">ONE-TIME SETUP</span><h2>Connect Supabase</h2></div><button id="setup-close" type="button" class="quiet">Close</button></div><p class="small">Use a separate test project. Create the two confirmed demo users and run <a href="/setup.sql" target="_blank" rel="noopener">setup.sql</a> once. If you already ran the older version, run <a href="/add-report-action.sql" target="_blank" rel="noopener">add-report-action.sql</a> instead.</p><form id="config-form"><label for="project-url">Project URL</label><input id="project-url" type="url" placeholder="https://your-project.supabase.co" required><label for="public-key">Publishable key</label><input id="public-key" type="text" placeholder="sb_publishable_…" autocomplete="off" required><p class="small">Public browser key only. Secret and service_role keys are refused.</p><button class="primary" type="submit">Save connection</button></form><p id="setup-health" class="small" role="status"></p><div class="divider"></div><h3>Moving to another laptop?</h3><p class="small">Export the public connection settings, then import them on the Mac. This file contains the project URL and publishable key only. It contains no passwords or session tokens.</p><div class="buttons"><button id="export-config" type="button">Export settings</button><button id="import-config" type="button">Import settings</button></div><input id="config-file" type="file" accept="application/json,.json" hidden></dialog>
-</body></html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Private Reports · Login demo</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Private Reports home"
+        ><span class="logo" aria-hidden="true"
+          ><svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="5" y="10" width="14" height="11" rx="2"></rect>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg
+        ></span>
+        Private Reports</a
+      >
+      <div class="header-actions">
+        <span id="connection" class="connection">Not configured</span
+        ><button id="setup-open" class="quiet" type="button">Connection settings</button
+        ><button id="logout" class="quiet" type="button" hidden>Sign out</button>
+      </div>
+    </header>
+    <main>
+      <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="login-view" class="login-layout">
+        <div class="intro">
+          <span class="eyebrow">YOUR WORK, IN ONE PLACE</span>
+          <h1>A private space.<br />A simple sign-in.</h1>
+          <p>Sign in to access your reports and download a copy whenever you need it.</p>
+          <div class="preview-card" aria-hidden="true">
+            <span class="file-icon">↗</span>
+            <div><strong>Your private report</strong><span>Available to your account</span></div>
+            <span class="mini-lock">▣</span>
+          </div>
+          <p class="small">Course demo · Invented accounts and reports</p>
+        </div>
+        <div class="card login-card">
+          <span class="eyebrow">WELCOME BACK</span>
+          <h2>Sign in to Private Reports</h2>
+          <p class="muted">Use your account email and password.</p>
+          <form id="login-form">
+            <label for="email">Email address</label
+            ><input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="username"
+              placeholder="alice@test.invalid"
+              required
+            /><label for="password">Password</label
+            ><input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            /><button id="sign-in" class="primary" type="submit">Sign in <span>→</span></button>
+          </form>
+          <p class="small">Your password is checked by Supabase over HTTPS.</p>
+        </div>
+      </section>
+      <section id="dashboard" hidden>
+        <div class="welcome">
+          <div>
+            <span class="eyebrow">YOUR ACCOUNT</span>
+            <h1>Welcome back.</h1>
+            <p id="identity" class="muted"></p>
+          </div>
+          <span class="badge">Signed in</span>
+        </div>
+        <article class="card report-card">
+          <div class="report-art" aria-hidden="true">
+            <div class="paper">
+              <i></i><i></i><i></i>
+              <div class="paper-chart"><b></b><b></b><b></b><b></b></div>
+            </div>
+          </div>
+          <div class="report-copy">
+            <span class="eyebrow">PRIVATE DOCUMENT</span>
+            <h2>Your account report</h2>
+            <p>
+              Download the report belonging to your account. Access is checked each time you request
+              it.
+            </p>
+            <button id="download" class="primary" type="button">
+              Download my report <span>↓</span>
+            </button>
+            <p id="download-status" class="small" role="status">Ready when you are.</p>
+          </div>
+        </article>
+        <div id="report-preview" class="card" hidden>
+          <h3>Report received</h3>
+          <p class="small">Invented data returned by Supabase for this account.</p>
+          <pre id="report-json"></pre>
+        </div>
+      </section>
+      <section class="lab">
+        <details id="session-details">
+          <summary>
+            Session & access tools <span>Inspect the requests behind this page</span>
+          </summary>
+          <div class="lab-body">
+            <div class="lab-grid">
+              <section>
+                <h3>Current session</h3>
+                <p id="restore-state" class="small"></p>
+                <p class="small">
+                  Access token expires in <strong id="timer">—</strong>. The API checks its actual
+                  expiry.
+                </p>
+                <div class="buttons">
+                  <button id="refresh" type="button">Refresh session</button
+                  ><button id="reload-page" type="button">Reload page</button>
+                </div>
+                <div class="tabs" role="group" aria-label="JWT section">
+                  <button data-part="header" type="button">Header</button
+                  ><button data-part="payload" type="button" class="active">Payload</button
+                  ><button data-part="signature" type="button">Signature</button>
+                </div>
+                <pre id="decoded">Sign in to inspect the token.</pre>
+                <p id="part-note" class="small">
+                  Decoding reads the claims. It does not verify the signature.
+                </p>
+                <details>
+                  <summary>Reveal access token</summary>
+                  <p class="small">
+                    Treat it like a credential. Reveal only a test account token; avoid sharing
+                    recordings of the full value.
+                  </p>
+                  <textarea
+                    id="raw-token"
+                    readonly
+                    aria-label="Access token"
+                    spellcheck="false"
+                  ></textarea>
+                </details>
+                <p class="small">
+                  DevTools → Application (Chrome) or Storage (Firefox) → Local Storage → this site →
+                  <code>team3-supabase-session-v1</code>. Safari: enable developer features in
+                  Settings → Advanced, then inspect Storage. This teaching app stores its token pair
+                  in localStorage.
+                </p>
+              </section>
+              <section>
+                <h3>Test the protected action</h3>
+                <p class="small">
+                  These buttons call the same report endpoint. They do not change the access rules.
+                </p>
+                <button id="anonymous" type="button">Request report without a token</button>
+                <div id="anonymous-result" class="result" role="status">No request sent yet.</div>
+                <div class="divider"></div>
+                <h3>Try a copied token</h3>
+                <p class="small">
+                  Capture while signed in, sign out, then replay. The copy stays in page memory
+                  only; reloading clears it.
+                </p>
+                <div class="buttons">
+                  <button id="capture" type="button">Capture token</button
+                  ><button id="replay" type="button">Replay copied token</button
+                  ><button id="clear-capture" type="button" class="quiet">Clear copy</button>
+                </div>
+                <div id="replay-state" class="result" role="status">No copy captured.</div>
+                <p class="small">
+                  Logout revokes refresh access. An existing access JWT may still be accepted until
+                  expiry. Read the actual response.
+                </p>
+                <button id="tests" type="button">Check token tampering & owner access</button>
+                <div id="test-results" aria-live="polite"></div>
+              </section>
+            </div>
+            <details class="subsection">
+              <summary>Verify the second account</summary>
+              <p class="small">
+                Before testing Alice’s access to Bob’s note, confirm Bob can read that note himself.
+                His token is never stored.
+              </p>
+              <form id="baseline-form" class="inline-form">
+                <label for="bob-password">Bob’s password</label
+                ><input id="bob-password" type="password" autocomplete="off" required /><button
+                  type="submit"
+                >
+                  Verify Bob’s note
+                </button>
+              </form>
+              <p id="baseline-status" class="small"></p>
+            </details>
+            <details class="subsection">
+              <summary>How Google sign-in works (diagram)</summary>
+              <ol class="oauth">
+                <li>The app starts a PKCE flow with Supabase.</li>
+                <li>
+                  Supabase redirects to Google. A Google password is entered only on Google’s page.
+                </li>
+                <li>Google returns a provider authorization code to Supabase.</li>
+                <li>
+                  Supabase exchanges that code with Google using its server-side client
+                  configuration.
+                </li>
+                <li>Supabase sends a separate auth code back to the app.</li>
+                <li>The app exchanges that code with its PKCE verifier for a Supabase session.</li>
+              </ol>
+              <p class="small">
+                No live Google integration is configured here. The site does not receive your Google
+                password.
+              </p>
+            </details>
+            <details class="subsection">
+              <summary>Request activity</summary>
+              <div class="buttons">
+                <button id="clear-log" type="button" class="quiet">Clear activity</button>
+              </div>
+              <ol id="trail" class="trail">
+                <li>No requests yet. Token and password values are omitted.</li>
+              </ol>
+            </details>
+          </div>
+        </details>
+      </section>
+      <footer>
+        Private Reports · Supabase login demo<span>Made for the Mayerfeld Practicum</span>
+      </footer>
+    </main>
+    <dialog id="setup">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">ONE-TIME SETUP</span>
+          <h2>Connect Supabase</h2>
+        </div>
+        <button id="setup-close" type="button" class="quiet">Close</button>
+      </div>
+      <p class="small">
+        Use a separate test project. Create the two confirmed demo users and run
+        <a href="/setup.sql" target="_blank" rel="noopener">setup.sql</a> once. If you already ran
+        the older version, run
+        <a href="/add-report-action.sql" target="_blank" rel="noopener">add-report-action.sql</a>
+        instead.
+      </p>
+      <form id="config-form">
+        <label for="project-url">Project URL</label
+        ><input
+          id="project-url"
+          type="url"
+          placeholder="https://your-project.supabase.co"
+          required
+        /><label for="public-key">Publishable key</label
+        ><input
+          id="public-key"
+          type="text"
+          placeholder="sb_publishable_…"
+          autocomplete="off"
+          required
+        />
+        <p class="small">Public browser key only. Secret and service_role keys are refused.</p>
+        <button class="primary" type="submit">Save connection</button>
+      </form>
+      <p id="setup-health" class="small" role="status"></p>
+      <div class="divider"></div>
+      <h3>Moving to another laptop?</h3>
+      <p class="small">
+        Export the public connection settings, then import them on the Mac. This file contains the
+        project URL and publishable key only. It contains no passwords or session tokens.
+      </p>
+      <div class="buttons">
+        <button id="export-config" type="button">Export settings</button
+        ><button id="import-config" type="button">Import settings</button>
+      </div>
+      <input id="config-file" type="file" accept="application/json,.json" hidden />
+    </dialog>
+  </body>
+</html>

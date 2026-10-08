@@ -63,3 +63,19 @@ Export/download filenames and Mac instructions use plain report names.
 Existing public-settings files remain compatible. JavaScript syntax and the
 40 Node checks passed. The previous live Supabase results remain dated 8 Oct;
 a graphical-browser/Mac rehearsal is still needed.
+
+9 OCTOBER 2026 — CODE ORGANIZATION
+- app.js now handles startup and event wiring; named functions are imported
+  from separate API, state, UI, auth, reports, settings and token-lab modules.
+- Constants are centralized in js/constants.js; static-server configuration
+  lives in server-config.mjs. The server explicitly serves the new modules.
+- HTML, CSS, JavaScript and package.json are formatted with two-space indentation
+  and blank lines between functions. Saved storage/file formats are unchanged.
+- 49 Node checks passed, including every browser module route and refusal to
+  serve server configuration as a public file.
+- 45 isolated DOM checks load the actual ES module graph in separate jsdom/VM
+  contexts. These remain fixture-based checks, not a graphical rehearsal.
+- 15/15 live HTTP checks passed again using the extracted API client, covering
+  both logins, owner reports, anonymous denial, tampering, refresh, logout and
+  copied-token replay. Test sessions were signed out; no credentials saved.
+- No database schema, auth settings, keys or RLS policies changed for this refactor.

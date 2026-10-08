@@ -1,1 +1,8 @@
-{"name":"supabase-login-explained","private":true,"type":"module","scripts":{"start":"node server.mjs","test":"node self-test.mjs"},"description":"Real Supabase login and protected report demo. No npm dependencies.","engines":{"node":">=20"}}
+{
+  "name": "supabase-login-explained",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server.mjs", "test": "node self-test.mjs" },
+  "description": "Real Supabase login and protected report demo. No npm dependencies.",
+  "engines": { "node": ">=20" }
+}

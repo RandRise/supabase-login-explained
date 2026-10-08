@@ -2,30 +2,71 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-const dir = dirname(fileURLToPath(import.meta.url));
-const files = new Map([['/','index.html'],['/app.js','app.js'],['/core.mjs','core.mjs'],['/style.css','style.css'],['/setup.sql','setup.sql'],['/add-report-action.sql','add-report-action.sql'],['/connection.public.json','connection.local.json']]);
-const mime = {html:'text/html',js:'text/javascript',mjs:'text/javascript',css:'text/css',sql:'text/plain',json:'application/json'};
+import {
+  DEFAULT_PORT,
+  SERVER_HOST,
+  ALLOWED_HOST,
+  ALLOWED_METHODS,
+  STATIC_FILES,
+  CONTENT_TYPES,
+  SECURITY_HEADERS,
+} from './server-config.mjs';
+const directory = dirname(fileURLToPath(import.meta.url));
+const files = new Map(STATIC_FILES);
+
 export function createStaticServer() {
-  return createServer(async (req,res)=>{
-    const host = req.headers.host || '';
-    if (!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(host)) {res.writeHead(403);res.end('Host rejected');return;}
-    const path = new URL(req.url,'http://'+host).pathname;
-    if (!['GET','HEAD'].includes(req.method)) {res.writeHead(405);res.end('Static files only');return;}
+  return createServer(async (request, response) => {
+    const host = request.headers.host || '';
+    if (!ALLOWED_HOST.test(host)) {
+      response.writeHead(403);
+      response.end('Host rejected');
+      return;
+    }
+    if (!ALLOWED_METHODS.includes(request.method)) {
+      response.writeHead(405);
+      response.end('Static files only');
+      return;
+    }
+    const path = new URL(request.url, 'http://' + host).pathname;
     const file = files.get(path);
-    if (!file) {res.writeHead(404);res.end('Not found');return;}
+    if (!file) {
+      response.writeHead(404);
+      response.end('Not found');
+      return;
+    }
     try {
-      const bytes = await readFile(join(dir,file));
-      res.writeHead(200,{
-        'Content-Type':mime[file.split('.').pop()]+'; charset=utf-8',
-        'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',
-        'Referrer-Policy':'no-referrer',
-        'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
-      });res.end(req.method === 'HEAD' ? undefined : bytes);
-    }catch(e){res.writeHead(e.code === 'ENOENT' ? 404 : 500);res.end('File unavailable');}
+      const bytes = await readFile(join(directory, file));
+      const extension = file.split('.').pop();
+      response.writeHead(200, {
+        'Content-Type': CONTENT_TYPES[extension] + '; charset=utf-8',
+        ...SECURITY_HEADERS,
+      });
+      response.end(request.method === 'HEAD' ? undefined : bytes);
+    } catch (error) {
+      response.writeHead(error.code === 'ENOENT' ? 404 : 500);
+      response.end('File unavailable');
+    }
   });
 }
+
+function startServer() {
+  const server = createStaticServer();
+  const port = Number(process.env.PORT || DEFAULT_PORT);
+  server.on('error', (error) => {
+    console.error(
+      error.code === 'EADDRINUSE'
+        ? 'Port ' + port + ' is busy. Close the old terminal or set PORT.'
+        : error.message,
+    );
+    process.exitCode = 1;
+  });
+  server.listen(port, SERVER_HOST, () => {
+    console.log('Supabase Login Demo: http://' + SERVER_HOST + ':' + port);
+    console.log('This server serves files only. Supabase performs all login and data checks.');
+    console.log('Leave this terminal open. Ctrl+C stops it.');
+  });
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const server = createStaticServer(), port = Number(process.env.PORT || 8772);
-  server.on('error',e=>{console.error(e.code === 'EADDRINUSE' ? 'Port '+port+' is busy. Close the old terminal or set PORT.' : e.message);process.exitCode=1;});
-  server.listen(port,'127.0.0.1',()=>console.log('Supabase Login Demo: http://127.0.0.1:'+port+'\nThis server serves files only. Supabase performs all login and data checks.\nLeave this terminal open. Ctrl+C stops it.'));
+  startServer();
 }
