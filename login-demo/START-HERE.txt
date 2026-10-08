@@ -1,0 +1,124 @@
+BEHIND THE LOGIN — SUPABASE FROM THE START
+Team 3 / Mayerfeld Practicum
+8 October 2026
+
+WHAT THIS IS
+A guided, real-provider classroom demo. Supabase handles password checks,
+session tokens and the database access rules. The small local Node server only
+serves the page. There is no local-auth mode, fake login or AI API.
+
+You will show one private note, inspect the actual Supabase token, reload the
+page, and test a copied token. Speaking notes are visible beside each step.
+Google sign-in is an explanatory diagram; a real Google OAuth integration is
+not included and is not needed for the password/token demo.
+
+BEFORE THE SESSION — DO THESE FOUR THINGS
+
+1. OPEN YOUR OWN SUPABASE TEST PROJECT
+Go to https://supabase.com/dashboard and sign in yourself.
+If you do not have an account, complete signup yourself.
+Create a separate test project. Choose the available free plan if suitable and
+check its current limits. Set its database password yourself. Wait for the
+project to become ready. The app does not use that database password.
+
+2. CREATE THE TWO USERS
+Authentication → Users → Add user / Create user (labels may vary).
+Create and confirm:
+  alice@test.invalid   password: DemoAlice!2026
+  bob@test.invalid     password: DemoBob!2026
+
+These passwords are deliberately public TEACHING values, not private account
+passwords. Use this only in a test project containing invented data.
+Choose Auto Confirm User / Confirm email. Do not use Invite: .invalid addresses
+cannot receive email. If your project rejects either example password under
+its password policy, choose a different invented password and type that one
+in the app. You create the credentials yourself.
+
+3. CREATE THE NOTES
+Open setup.sql from this folder in a text editor.
+In your test project's SQL Editor, create a new query, paste the entire file
+and Run ONCE.
+
+It verifies both users are confirmed, creates a new isolated table, enables
+RLS and seeds one invented private note for each user automatically.
+You do not enter records or copy UUIDs.
+It does not edit any course app table, grant write access to browser users or
+disable RLS. If the table name already exists, inspect the collision or use a
+fresh test project. Do not delete anything blindly.
+
+4. CONNECT THE APP
+Extract this ZIP into a normal folder.
+Install a supported Node.js LTS release from https://nodejs.org/ if needed.
+Windows: double-click start-demo.cmd.
+Mac/Linux: open a terminal in this folder and run node server.mjs.
+No npm install, GitHub repo, branch or deployment is required.
+Leave the terminal running. Open http://127.0.0.1:8772.
+
+Copy Project URL and publishable key from Supabase's Connect dialog.
+Settings → API Keys is another place to find the publishable key.
+Enter these in Setup:
+  https://YOUR-PROJECT-REF.supabase.co
+  sb_publishable_...
+
+Never enter a secret or service_role key. The app refuses those.
+Save project & check the table.
+Enter Bob's invented password and click Verify Bob's example.
+Then Close setup. Sign in as Alice using her invented password.
+
+That's the preparation. Keep the Supabase dashboard out of screen share;
+the app contains everything needed for the walkthrough.
+
+YOUR REHEARSAL
+1. Sign in as Alice. Confirm a real /auth/v1/token request returned HTTP 200.
+2. Inspect: find the actual token in DevTools and point out sub, exp and iss.
+3. Remember: read Alice's note, then click Reload this page. It should return.
+4. Copy & test: run evidence checks. Bob's known note should be unavailable.
+5. Capture token → Sign out → Replay copy. Read the actual HTTP response.
+6. Google: explain the diagram. It is labelled as a diagram, not a real login.
+
+The unchanged token must read Alice's known note before altered-token results
+are treated as evidence. Bob's baseline must exist in the same project.
+A request error is INCONCLUSIVE, not a security success.
+If DATA EXPOSED appears, fix the demo table's rules before presenting.
+
+TOKEN EXPIRY
+The app displays Supabase's actual expiry. It does not force a 90-second timer,
+forge a provider response, or change your project's settings.
+Supabase access tokens commonly last around one hour. Do not spend an hour
+waiting during the presentation. Show the exp claim and explain it; if you
+want an expired-token replay, record it in advance after its actual expiry.
+Editing exp is a tampering test, NOT proof of natural token expiry.
+Refresh is manual here. A stored expired access token can be refreshed using
+Refresh my session if the refresh token is still accepted.
+Logout revokes the session's refresh token; a copied access JWT may remain
+accepted by the Data API until expiry. Additional server checks can change this.
+
+IF SOMETHING DOESN'T WORK
+Invalid login: confirm the user exists, is confirmed and the password matches.
+Missing table / 404: run setup.sql after creating both confirmed users.
+No known notes: check that SQL completed successfully in this same project.
+401 on data: inspect the response; expiry, key or token errors can differ.
+NETWORK ERROR: check the connection, project URL and whether the project is ready.
+Port busy: close an old server terminal, or use PowerShell:
+  $env:PORT='8773'
+  node server.mjs
+Then open http://127.0.0.1:8773. Do not double-click index.html directly.
+
+WHAT TO SEND YOUR GROUP
+Send this ZIP, discord-message.txt and PRESENTATION.txt. A localhost link
+works only on the computer running the app. The presenter can share their
+screen; other teammates do not need accounts or installs.
+Do not send access/refresh tokens, private project keys or real passwords.
+
+LIMITS
+Tokens are deliberately observable in localStorage for teaching. An XSS bug
+could read them. This is not a production session-management template.
+This app calls Supabase's REST endpoints directly so requests are easy to show.
+The official SDK is appropriate for many production projects.
+Only read access to the invented notes is demonstrated. The experiment does
+not prove every endpoint in a larger app is secure.
+Close the server with Ctrl+C and sign out afterwards.
+
+See VALIDATION.txt for exactly what has been tested. Real Supabase connection,
+SQL execution and browser rehearsal must be completed against your test
+project before presenting the demo as verified.

@@ -1,0 +1,17 @@
+# Credentials and personal configuration
+.env
+.env.*
+!.env.example
+*.local.json
+session*.json
+supabase-access-token*
+.supabase/
+
+# Dependencies, logs and generated evidence
+node_modules/
+*.log
+recordings/
+screenshots/
+*.zip
+.DS_Store
+Thumbs.db

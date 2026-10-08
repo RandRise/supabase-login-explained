@@ -1,0 +1,40 @@
+VALIDATION — 8 OCTOBER 2026
+
+This pack is a Supabase-only app. It contains no working fake-auth backend.
+The local server serves browser files and never handles credentials.
+
+PASSED
+- JavaScript module syntax checks.
+- 29 automated checks for JWT decoding, malformed payload rejection, unchanged
+  signature after claim edits, public-key validation, project-scoped baseline
+  classification and static-server routing/security headers.
+- 28 isolated DOM/request-contract checks for the actual app code: configuration,
+  secret-key refusal, Bob baseline, no saved Bob token, password clearing, Alice
+  login, annotated claims, owner-note rendering, restored session on a fresh
+  document, five evidence outcomes, refresh, logout, captured-token replay,
+  redacted request trail, Google diagram and API request headers.
+
+The DOM checks used jsdom with explicitly mocked provider responses.
+They do NOT prove Supabase accepted a login or enforced RLS.
+The test-only dependency and mocks are outside the ZIP and are not required
+to run the app. self-test.mjs uses only Node built-ins.
+
+REMAINING
+- Create/choose your own real Supabase test project.
+- Create and confirm the two users, then run setup.sql.
+- Configure the project URL/public key and verify Bob's example.
+- Rehearse the real browser walkthrough using PRESENTATION.txt.
+- Confirm actual provider results, including Alice's known note, rejection of
+  modified JWTs and no access to Bob's previously confirmed note.
+- Review visual layout in the live browser.
+
+Browser control was unavailable during this session, so no screenshot,
+interactive browser rehearsal or live Supabase test is claimed.
+The SQL was reviewed against official docs but not executed in a database.
+Mac/Linux launcher instructions were not run on those systems.
+No real project configuration, live token, secret key or personal credential
+was added to this pack.
+
+Optional: node self-test.mjs runs the 29 local structural checks.
+For a real security demonstration, the pre-session walkthrough matters more
+than the structural tests. This is a teaching lab, not a production audit.

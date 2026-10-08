@@ -1,0 +1,31 @@
+PRIMARY SOURCES — checked 8 October 2026
+
+Password hashing: Supabase uses salted bcrypt; hashing is not encryption.
+https://supabase.com/docs/guides/auth/password-security
+
+Access and refresh tokens, lifetime, refresh reuse handling, logout limits.
+https://supabase.com/docs/guides/auth/sessions
+https://supabase.com/docs/guides/auth/server-side/advanced-guide
+
+Publishable key identifies the public application. A user JWT identifies the
+signed-in user. Secret/service_role keys bypass RLS and must not be in browsers.
+https://supabase.com/docs/guides/getting-started/api-keys
+
+Readable JWT fields and signing-key distinctions.
+https://supabase.com/docs/guides/auth/jwt-fields
+https://supabase.com/docs/guides/auth/signing-keys
+
+RLS owner policies and table grants. Anonymous requests and Supabase anonymous
+users are different. Enabled RLS alone is not proof that a policy is restrictive.
+https://supabase.com/docs/guides/database/postgres/row-level-security
+
+Google redirect OAuth and the separate Supabase PKCE app-code exchange.
+https://supabase.com/docs/guides/auth/social-login/auth-google
+https://supabase.com/docs/guides/auth/sessions/pkce-flow
+
+Official Auth REST contract.
+https://github.com/supabase/auth/blob/master/openapi.yaml
+
+This adaptation builds on the topics in the teammate's original login explainer.
+The new app and setup are separate; original Downloads files are unchanged.
+The old local-auth pack remains available but is not a mode in this version.

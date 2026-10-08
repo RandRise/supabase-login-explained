@@ -1,0 +1,17 @@
+I’m going to present the demo. I’ve simplified it into a guided Supabase
+walkthrough: sign in as Alice, inspect the real token, refresh the page, then
+show what a copied token can access.
+
+We’ll use one private note for Alice and another for Bob. Supabase handles
+login and the database access rules. The app checks Bob’s note exists before
+we claim Alice cannot read it.
+
+The Google part is a clear diagram, not a live Google integration. That keeps
+the demo focused without needing a Google OAuth setup as well.
+
+I’ll prepare the test project and rehearse it. You don’t all need to install
+anything; I’ll share my screen. PRESENTATION.txt explains the flow and includes
+a suggested split for the rest of us.
+
+The new ZIP is the Supabase version. We should rehearse before presenting it;
+the provider connection still needs to be configured in our test project.
