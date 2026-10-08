@@ -56,3 +56,10 @@ The Mac instructions use portable Node and shell commands, but were not run
 on a Mac. The local Node server and HTTP routes were exercised on Windows.
 No live tokens, secret keys, personal passwords or browser-storage dumps were
 added to the repo. This is a teaching demo, not a production security audit.
+
+9 OCTOBER 2026 — LABEL CHANGE
+Replaced the visible Folio branding with Private Reports and a lock icon.
+Export/download filenames and Mac instructions use plain report names.
+Existing public-settings files remain compatible. JavaScript syntax and the
+40 Node checks passed. The previous live Supabase results remain dated 8 Oct;
+a graphical-browser/Mac rehearsal is still needed.

@@ -18,7 +18,7 @@ Windows: double-click `login-demo/start-demo.cmd`, or run the same Node command.
 
 ## Use the same Supabase project on both laptops
 
-On the first laptop, open **Connection settings → Export settings**. Move `folio-connection.public.json` to the Mac. Start the app there, open **Connection settings → Import settings**, and select that file. Then sign in again.
+On the first laptop, open **Connection settings → Export settings**. Move `reports-connection.public.json` to the Mac. Start the app there, open **Connection settings → Import settings**, and select that file. Then sign in again.
 
 The export contains the project URL and public browser key only. It does not transfer your login, passwords or tokens. You do not need a second Supabase project, database setup, GitHub login, OAuth redirect change or deployment. Both laptops need an internet connection.
 

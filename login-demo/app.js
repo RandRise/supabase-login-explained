@@ -84,7 +84,7 @@ $('#download').addEventListener('click',()=>run(async()=>{
  try{const r=await report(t,target);if(session!==expected||config!==target)return;
  if(!r.ok){$('#download-status').textContent='HTTP '+r.status+' · Report was not downloaded.';throw Error(error(r));}
  if(!reportValid(r.data,decode(t).payload.sub))throw Error('Report content is missing or has an unexpected owner. Check setup and RLS before presenting.');
- $('#report-json').textContent=JSON.stringify(r.data,null,2);$('#report-preview').hidden=false;downloadFile('folio-private-report.json',r.data);$('#download-status').textContent='HTTP '+r.status+' · Access granted. Your report was downloaded.';notice('Your report is ready.');}
+ $('#report-json').textContent=JSON.stringify(r.data,null,2);$('#report-preview').hidden=false;downloadFile('private-report.json',r.data);$('#download-status').textContent='HTTP '+r.status+' · Access granted. Your report was downloaded.';notice('Your report is ready.');}
  catch(e){if(session===expected&&config===target){$('#download-status').textContent='Download failed. '+e.message;throw e;}}
 }));
 $('#anonymous').addEventListener('click',()=>run(async()=>{
@@ -131,10 +131,10 @@ $('#tests').addEventListener('click',()=>run(async()=>{
 }));
 document.querySelectorAll('[data-part]').forEach(b=>b.addEventListener('click',()=>{part=b.dataset.part;renderToken();}));
 $('#setup-open').addEventListener('click',()=>$('#setup').showModal());$('#setup-close').addEventListener('click',()=>$('#setup').close());
-$('#export-config').addEventListener('click',()=>{if(!config)return;downloadFile('folio-connection.public.json',{format:'folio-public-connection-v1',...validateConfig(config.url,config.key)});notice('Exported public settings only. Sign in separately on the other laptop.');});
+$('#export-config').addEventListener('click',()=>{if(!config)return;downloadFile('reports-connection.public.json',{format:'folio-public-connection-v1',...validateConfig(config.url,config.key)});notice('Exported public settings only. Sign in separately on the other laptop.');});
 $('#import-config').addEventListener('click',()=>$('#config-file').click());
 $('#config-file').addEventListener('change',()=>run(async()=>{
- try{const file=$('#config-file').files[0];if(!file)return;if(file.size>20000)throw Error('Select the small public connection settings file.');const data=JSON.parse(await file.text());if(data.format!=='folio-public-connection-v1'||Object.keys(data).some(k=>!['format','url','key'].includes(k)))throw Error('Import only a Folio public connection file. Session exports are refused.');connect(validateConfig(data.url,data.key));await checkConnection();}
+ try{const file=$('#config-file').files[0];if(!file)return;if(file.size>20000)throw Error('Select the small public connection settings file.');const data=JSON.parse(await file.text());if(data.format!=='folio-public-connection-v1'||Object.keys(data).some(k=>!['format','url','key'].includes(k)))throw Error('Import only a public connection settings file. Session exports are refused.');connect(validateConfig(data.url,data.key));await checkConnection();}
  finally{$('#config-file').value='';}
 }));
 $('#clear-log').addEventListener('click',()=>{$('#trail').textContent='';trailCount=0;});

@@ -16,7 +16,7 @@ login-demo folder, and run node server.mjs. No npm install step is needed.
 
 ON THE ORIGINAL LAPTOP
 In the app: Connection settings > Export settings.
-Move folio-connection.public.json to the Mac (AirDrop, USB, or a private message).
+Move reports-connection.public.json to the Mac (AirDrop, USB, or a private message).
 It includes only the project URL and publishable key, not passwords or tokens.
 
 BACK ON THE MAC

@@ -1,4 +1,4 @@
-START HERE — FOLIO / SUPABASE LOGIN DEMO
+START HERE — PRIVATE REPORTS / SUPABASE LOGIN DEMO
 
 Already configured the older demo?
 Keep the same users and notes. Run add-report-action.sql ONCE in that project's
