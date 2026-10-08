@@ -1,0 +1,39 @@
+ON YOUR MAC — ABOUT TWO MINUTES AFTER NODE IS INSTALLED
+
+1. Install Node.js LTS from https://nodejs.org/ (choose the macOS installer).
+2. Open Terminal and paste these three lines:
+
+   git clone https://github.com/RandRise/supabase-login-explained.git
+   cd supabase-login-explained/login-demo
+   npm start
+
+3. Open http://127.0.0.1:8772 in Chrome, Safari or Firefox.
+   Leave Terminal open. Ctrl+C stops the server.
+
+If git asks for Apple's command-line tools, install them and repeat step 2.
+Alternative: GitHub > Code > Download ZIP. Extract it, open Terminal in the
+login-demo folder, and run node server.mjs. No npm install step is needed.
+
+ON THE ORIGINAL LAPTOP
+In the app: Connection settings > Export settings.
+Move folio-connection.public.json to the Mac (AirDrop, USB, or a private message).
+It includes only the project URL and publishable key, not passwords or tokens.
+
+BACK ON THE MAC
+Connection settings > Import settings > select that JSON file.
+Close settings and sign in as Alice using the same demo password.
+Click Download my report, then test Request report without a token.
+You use the existing Supabase project; no SQL, new users or new project required.
+If the first laptop has not been configured yet, follow START-HERE.txt first.
+
+BEFORE YOUR PRESENTATION
+Use this laptop/browser to rehearse. Confirm internet access and that Supabase
+is not paused. Share the browser window; keep account settings out of view.
+Sign in first and keep the inspection panel collapsed for the opening screen.
+Tokens captured for replay stay only in memory, so capture again after a reload.
+Normal login is saved in this browser. Private/incognito windows start fresh.
+
+UPDATES LATER
+Stop the server with Ctrl+C. From the repository folder, run git pull, then
+start it again. If you made your own source edits, inspect them before pulling;
+do not reset or discard files blindly.

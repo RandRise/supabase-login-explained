@@ -1,40 +1,42 @@
-VALIDATION — 8 OCTOBER 2026
-
-This pack is a Supabase-only app. It contains no working fake-auth backend.
-The local server serves browser files and never handles credentials.
+VALIDATION — 8 OCTOBER 2026 / LOGIN PAGE + PROTECTED REPORT
 
 PASSED
 - JavaScript module syntax checks.
-- 29 automated checks for JWT decoding, malformed payload rejection, unchanged
-  signature after claim edits, public-key validation, project-scoped baseline
-  classification and static-server routing/security headers.
-- 28 isolated DOM/request-contract checks for the actual app code: configuration,
-  secret-key refusal, Bob baseline, no saved Bob token, password clearing, Alice
-  login, annotated claims, owner-note rendering, restored session on a fresh
-  document, five evidence outcomes, refresh, logout, captured-token replay,
-  redacted request trail, Google diagram and API request headers.
+- 40 Node built-in checks: JWT decoder, config safety, owner-report validation,
+  evidence classification, static routing and security headers.
+- 42 isolated DOM checks: signed-out/in UI, collapsed tools, no speaking notes,
+  password clearing, authenticated report request/download, omitted bearer for
+  anonymous requests, 401 denial, 404/500 inconclusive results, wrong-owner
+  refusal, copied-token replay after logout, Bob baseline, tampering tests,
+  public-settings export/import, refusal of token-bearing imports, session restoration and a late-response/logout race.
+- 19 local PostgreSQL checks using PGlite: execute setup.sql, execute the upgrade
+  script, anonymous RPC raises 42501, Alice/Bob own report only, direct SELECT
+  obeys RLS, Alice cannot SELECT Bob's note, anonymous SELECT returns zero rows,
+  writes refused, unrelated role cannot execute RPC, SECURITY INVOKER enforced,
+  empty search_path, and upgrade preserves the seeded notes.
 
-The DOM checks used jsdom with explicitly mocked provider responses.
-They do NOT prove Supabase accepted a login or enforced RLS.
-The test-only dependency and mocks are outside the ZIP and are not required
-to run the app. self-test.mjs uses only Node built-ins.
+WHAT THOSE CHECKS MEAN
+The DOM tests used fixture HTTP responses, not a live provider.
+The SQL tests executed actual PostgreSQL logic in a local WASM engine with a
+fixture auth.uid() context. They do not test real Supabase JWT cryptography,
+its Auth service, or PostgREST's HTTP mapping.
+Test-only jsdom/PGlite packages are in the ignored .qa folder; they are not
+included in the app, repository or ZIP. npm test requires no dependencies.
+No simulated auth mode or local credential handler was added to the app.
 
-REMAINING
-- Create/choose your own real Supabase test project.
-- Create and confirm the two users, then run setup.sql.
-- Configure the project URL/public key and verify Bob's example.
-- Rehearse the real browser walkthrough using PRESENTATION.txt.
-- Confirm actual provider results, including Alice's known note, rejection of
-  modified JWTs and no access to Bob's previously confirmed note.
-- Review visual layout in the live browser.
+STILL REQUIRED BEFORE THE PRESENTATION
+- Create/choose the Supabase project: the connected account currently has none.
+- Create/confirm two test users and execute setup.sql (or the upgrade script if
+  you already configured the original app yourself).
+- Configure URL/public key. Confirm Alice's real download returns HTTP 200 and
+  the anonymous request returns HTTP 401 with the report's sign-in message.
+- Confirm Bob's baseline, actual signature rejection and owner-only access.
+- Rehearse the captured-token replay and explain its actual response.
+- Review layout/downloads in a graphical browser and run on the actual Mac.
 
-Browser control was unavailable during this session, so no screenshot,
-interactive browser rehearsal or live Supabase test is claimed.
-The SQL was reviewed against official docs but not executed in a database.
-Mac/Linux launcher instructions were not run on those systems.
-No real project configuration, live token, secret key or personal credential
-was added to this pack.
-
-Optional: node self-test.mjs runs the 29 local structural checks.
-For a real security demonstration, the pre-session walkthrough matters more
-than the structural tests. This is a teaching lab, not a production audit.
+Browser automation was unavailable: its runtime exited before opening a
+surface. No browser screenshots or visual verification are claimed.
+The Mac instructions use portable Node and shell commands, but were not run
+on a Mac. The local Node server and HTTP routes were exercised on Windows.
+No live tokens, secret keys, personal passwords or browser-storage dumps were
+added to the repo. This is a teaching demo, not a production security audit.

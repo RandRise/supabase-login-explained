@@ -29,3 +29,12 @@ export function boundary(result,baseline,scope,target) {
   if (result.data.length) return 'DATA EXPOSED';
   return baseline?.scope === scope && baseline.sub === target && baseline.rows > 0 ? 'BOUNDARY HELD' : 'NEEDS BASELINE';
 }
+export const REPORT_PATH = '/rest/v1/rpc/team3_download_private_report';
+export function reportValid(data,owner) {
+  return !!data && data.owner_id === owner && typeof data.generated_at === 'string' && Array.isArray(data.notes) && data.notes.length > 0 && data.notes.every(n=>n && n.user_id === owner && typeof n.title === 'string' && typeof n.body === 'string');
+}
+export function actionVerdict(result) {
+  if ([401,403].includes(result.status) && !result.ok) return 'DENIED';
+  if (result.ok && result.data && typeof result.data === 'object') return 'ACCEPTED';
+  return 'INCONCLUSIVE';
+}

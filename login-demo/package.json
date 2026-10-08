@@ -1,1 +1,1 @@
-{"private":true,"type":"module","description":"Supabase teaching demo; no npm dependencies."}
+{"name":"supabase-login-explained","private":true,"type":"module","scripts":{"start":"node server.mjs","test":"node self-test.mjs"},"description":"Real Supabase login and protected report demo. No npm dependencies.","engines":{"node":">=20"}}

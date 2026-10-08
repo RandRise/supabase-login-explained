@@ -1,114 +1,39 @@
-YOUR DEMO SCRIPT — BEHIND THE LOGIN
-Aim for 5–8 minutes; shorten to fit your group's overall time.
+DEMO SEQUENCE — PRIVATE REPORT / REAL SUPABASE
+Keep this file separate from the shared app window. Nothing is displayed as
+speaking notes inside the app.
 
-BEFORE YOU SHARE
-Start the app. Ensure Setup has a valid project and Bob's example is verified.
-Close unrelated tabs. Have Alice's invented password ready.
-Do not show dashboard secret keys or real credentials.
-Open DevTools in advance if you will show it. Use only the invented test users.
+1. Sign in as Alice, then Download my report.
+   "This looks like a normal account page. The download is an actual action:
+   the browser sends my access token to Supabase, which checks it and returns
+   only my report. The password was checked at login, not on every download."
 
-OPENING
-"I'll show what happens behind a login button. This is a real Supabase test
-project with two invented users and private notes. My laptop serves the page,
-while Supabase handles authentication and checks access to the data."
+2. Open Session & access tools. Request report without a token.
+   "This sends the same request without the Authorization header. Here is the
+   actual HTTP response. The server refused to return a report. Hiding the
+   download button alone would not be enough; this check happens at Supabase."
+   Show HTTP 401 AND the earlier successful download. An invalid key can also
+   cause 401, so confirm the unchanged token works before drawing a conclusion.
 
-01 SIGN IN
-Enter Alice's email and invented password, then sign in.
+3. Show Payload. Find sub, email, exp and iss. Reload.
+   "These claims are readable, but that does not make them trustworthy. The
+   API verifies the token. The browser stores a session so I can reload without
+   entering my password again. The next download still requires authorization."
 
-"The password goes over HTTPS to Supabase Auth. Supabase checks it against a
-salted bcrypt hash. It returns an access token and a refresh token.
-Our app stores them in this browser. The password is not inside the JWT."
+4. Capture token > Sign out > Replay copied token.
+   "A bearer token works through possession. This copy is held separately in
+   memory. Signing out removes the browser session and revokes refresh access,
+   but an access JWT may still work until its expiry. Let's read the response."
+   If accepted: it returned Alice's report. If rejected: show its error; do not
+   claim natural expiry unless the real exp and response support that.
 
-Point to HTTP 200 for /auth/v1/token in the request trail.
-The hashing explanation comes from provider documentation; the app does not
-expose Supabase's stored hash.
+5. Sign in as Alice again. Verify Bob's note using his password, then run checks.
+   "A copied token can act as Alice in this demo. It cannot become Bob's valid
+   token just by changing the identity or expiry: that breaks the signature.
+   Bob has a confirmed note, but Alice's unchanged token cannot read it."
 
-02 INSPECT
-Open Inspect and Payload.
+Optional Google explanation: open the diagram. Google receives the Google
+password; Supabase exchanges codes and gives the app its own session. This
+version does not perform a live Google sign-in.
 
-"This is the actual token Supabase issued. sub is Alice's user ID.
-exp is its expiry, and iss is its issuer. These claims are readable.
-Decoding does not check whether the signature is valid. The API does that."
-
-In DevTools → Application → Local Storage → this site's address, select
-team3-supabase-session-v1 and point to access_token.
-If showing Network instead, open a /rest/v1 note request and its Headers.
-Do not copy that token into chat.
-
-03 REMEMBER
-Open Remember, show Alice's note, then Reload this page.
-
-"I did not type the password again. The browser restored the stored tokens.
-The next request sends the access token to Supabase. Supabase still validates
-the request and the database applies its owner rule."
-
-"An access token authorizes requests. A refresh token obtains a fresh token
-pair. Different apps may store sessions in cookies instead of localStorage."
-
-04 COPY & TEST
-Run the evidence checks. Read the status and explanation of each result.
-
-"Reusing Alice's genuine token reads Alice's note. That's why a stolen token
-is a credential. No user token returns no notes in this table.
-Editing expiry or swapping the user ID leaves an invalid signature.
-Alice also cannot read Bob's note, which we confirmed Bob could read earlier."
-
-If a result says INCONCLUSIVE, stop the claim and explain the actual error.
-If DATA EXPOSED appears, say the rule is not protecting the data and fix setup;
-do not reinterpret it as a successful test.
-
-Capture token → Sign out → Replay copy.
-
-"I have signed out, but this request uses the copy I kept in memory.
-If it still works, logout did not instantly invalidate that access JWT.
-Supabase's Data API normally accepts it until its expiry. The refresh token
-is a separate credential that logout revokes."
-
-If rejected, read the response and explain its stated reason. Do not claim
-"logout invalidates every copied token" from a generic failure.
-Do not wait for the default expiry during the live presentation.
-
-05 GOOGLE
-Step through the diagram.
-
-"Google checks the Google account. Any Google password is entered at Google,
-not here. Google sends its authorization code to Supabase. Supabase exchanges
-that code, then returns a separate app code. The app exchanges its code with
-a PKCE verifier and receives a Supabase session. The app never gets my Google
-password."
-
-"This part is a diagram of the flow; we are not performing a live Google login."
-
-ENDING
-"The password proves identity at login. Tokens carry the session afterwards.
-A stolen accepted token can act with that user's permissions. It does not
-reveal the password or let someone rewrite the signed identity, and properly
-enforced access rules still limit the data it can reach."
-
-FOR YOUR FOUR TEAMMATES
-You: operate the app and explain the observations.
-One teammate: explain password hashing and HTTPS before the demo.
-One teammate: explain session/access/refresh terminology.
-One teammate: explain the Google sign-in diagram or take OAuth questions.
-One teammate: check sources, manage timing and handle the wrap-up.
-They do not all need to install the app. Rehearse once together and have
-someone ask: "What can an attacker do with Alice's token, and what can't they?"
-
-QUICK QUESTIONS
-Is the publishable key Alice's token?
-No. It identifies the public app; Alice's bearer JWT identifies the signed-in user.
-
-Does decoding crack the JWT?
-No. The header and payload are intentionally readable. Decoding is not verification.
-
-Can a stolen token change my password?
-That depends on the app's endpoints and reauthentication rules. Never claim token
-theft cannot cause account harm. This experiment tests only read access to notes.
-
-Does zero Bob rows alone prove RLS?
-No. Bob's data must be known to exist and setup/network errors must be resolved.
-
-Why is the token not in a cookie?
-This teaching client deliberately uses localStorage so the storage is easy to
-inspect. Other architectures use cookies, including HttpOnly cookies. XSS can
-steal localStorage tokens, so this is not a production security template.
+The example is read-only. No write permission is granted to browser users.
+Use invented credentials only. Never send a real token in the group chat.

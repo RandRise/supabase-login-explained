@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 const dir = dirname(fileURLToPath(import.meta.url));
-const files = new Map([['/','index.html'],['/app.js','app.js'],['/core.mjs','core.mjs'],['/style.css','style.css'],['/setup.sql','setup.sql']]);
+const files = new Map([['/','index.html'],['/app.js','app.js'],['/core.mjs','core.mjs'],['/style.css','style.css'],['/setup.sql','setup.sql'],['/add-report-action.sql','add-report-action.sql']]);
 const mime = {html:'text/html',js:'text/javascript',mjs:'text/javascript',css:'text/css',sql:'text/plain'};
 export function createStaticServer() {
   return createServer(async (req,res)=>{

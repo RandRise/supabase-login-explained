@@ -15,3 +15,6 @@ screenshots/
 *.zip
 .DS_Store
 Thumbs.db
+
+# Isolated development verification (not part of the demo)
+.qa/

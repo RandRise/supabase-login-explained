@@ -1,17 +1,15 @@
-I’m going to present the demo. I’ve simplified it into a guided Supabase
-walkthrough: sign in as Alice, inspect the real token, refresh the page, then
-show what a copied token can access.
+Updated the demo so it looks like a normal login page. After signing in you can
+actually download your own report. There is also a button that sends the same
+request without a token, so we can show the server refusing it.
 
-We’ll use one private note for Alice and another for Bob. Supabase handles
-login and the database access rules. The app checks Bob’s note exists before
-we claim Alice cannot read it.
+The token inspector, copied-token replay and owner-access checks are under
+"Session & access tools". There are no speaking notes on the page now.
 
-The Google part is a clear diagram, not a live Google integration. That keeps
-the demo focused without needing a Google OAuth setup as well.
+Code: https://github.com/RandRise/supabase-login-explained
+Mac setup: open login-demo/MAC-SETUP.txt. It needs Node.js, but no npm install.
+We can export the public connection settings from the first laptop and import
+them on the Mac, then sign in again. No need to recreate the Supabase project.
 
-I’ll prepare the test project and rehearse it. You don’t all need to install
-anything; I’ll share my screen. PRESENTATION.txt explains the flow and includes
-a suggested split for the rest of us.
-
-The new ZIP is the Supabase version. We should rehearse before presenting it;
-the provider connection still needs to be configured in our test project.
+If you already set up the earlier version, run add-report-action.sql once in
+the same project's SQL Editor. For a fresh project use setup.sql instead.
+We'll still need to finish the real Supabase setup and rehearse before class.

@@ -29,3 +29,16 @@ https://github.com/supabase/auth/blob/master/openapi.yaml
 This adaptation builds on the topics in the teammate's original login explainer.
 The new app and setup are separate; original Downloads files are unchanged.
 The old local-auth pack remains available but is not a mode in this version.
+
+Protected Postgres functions: SECURITY INVOKER, execute grants, empty search_path.
+https://supabase.com/docs/guides/database/functions
+
+PostgREST maps insufficient_privilege / SQLSTATE 42501 to HTTP 401 when
+anonymous, or 403 when authenticated. Missing functions / server failures are
+configuration errors, not evidence that the intended auth rule worked.
+https://supabase.com/docs/guides/api/rest/postgrest-error-codes
+https://supabase.com/docs/guides/api/securing-your-api
+
+Local SQL verification uses the PostgreSQL WASM engine PGlite. This confirms
+SQL behavior with fixture identity context, not Supabase's JWT verification.
+https://pglite.dev/docs/
