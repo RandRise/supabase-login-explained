@@ -13,3 +13,9 @@ them on the Mac, then sign in again. No need to recreate the Supabase project.
 If you already set up the earlier version, run add-report-action.sql once in
 the same project's SQL Editor. For a fresh project use setup.sql instead.
 The real Supabase setup is ready. We still need to rehearse signing in and downloading the report before class.
+
+Live provider checks are complete: both logins, owner reports, anonymous denial,
+modified-token rejection, refresh and replay after logout passed. The copied
+access token still returned Alice's report after logout; the refresh token was
+refused. We'll show that actual behavior in the presentation. Passwords and
+tokens are not included in the repository or ZIP.

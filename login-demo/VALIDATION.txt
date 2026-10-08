@@ -33,13 +33,21 @@ LIVE SUPABASE CHECKS — 8 OCTOBER 2026
 - Real anonymous SELECT on notes: HTTP 200, zero rows (different from denial).
 - Database inspection confirms RLS, auth.uid() owner rule, SECURITY INVOKER and
   empty function search_path. Security advisor returned no notices.
-- No live password login, authenticated download, refresh, tampering or copied
-  token replay is claimed yet: these require signing in with the demo passwords.
+- 15/15 real HTTP checks passed using the user's invented demo credentials:
+  Alice and Bob password login HTTP 200; each report HTTP 200 with correct owner;
+  anonymous report HTTP 401; Bob's seeded note exists; Alice's request for Bob's
+  confirmed note HTTP 200 with zero rows; edited exp/sub JWTs HTTP 401;
+  access JWT supplied as refresh token HTTP 400; genuine refresh HTTP 200;
+  Alice logout HTTP 204; captured access JWT replay after logout HTTP 200;
+  logged-out refresh token HTTP 400; Bob's test-session cleanup HTTP 204.
+- Live tokens and passwords stayed in process memory. The checks printed only
+  names, status codes and pass/fail. No test credentials or tokens saved.
+- These are direct Supabase HTTP tests using the app's decoder/report helpers.
+  Browser UI/download behavior remains covered by isolated DOM checks, not a
+  real browser rehearsal. Natural token expiry was not tested by waiting.
 
 STILL REQUIRED BEFORE THE PRESENTATION
 - Schema and seed notes are ALREADY installed in this project. Do not rerun setup.sql or add-report-action.sql here.
-- Confirm Alice's real download HTTP 200 and Bob's baseline.
-- Confirm actual signature rejection, owner-only access and copied-token replay.
 - Review layout/downloads in a graphical browser and run on the actual Mac.
 
 Browser automation was unavailable: its runtime exited before opening a
