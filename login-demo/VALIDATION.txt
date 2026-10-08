@@ -159,3 +159,65 @@ LIMITS / PRESENTATION REHEARSAL
 - localStorage and manual re-login after expiry are intentional demo choices.
 - RLS protects users from each other; project administrators can access data.
   This is not an end-to-end encrypted messenger or a production security audit.
+
+
+9 OCTOBER 2026 — BUILT-IN API PLAYGROUND (REPLACES EXTERNAL APP WALKTHROUGH)
+
+CHANGE
+- Single collapsible API client inside the demo; no Postman installation needed.
+- Read own inbox, send a note, query a selected inbox and attempt another sender.
+- Explicit bearer toggle; unchecked means NO Authorization header even if the
+  token input contains a value and the normal page is signed in.
+- Masked token input, Use signed-in token and Clear token. No reveal/copy button.
+  Token stays only in this panel's memory until cleared/reloaded, including
+  after normal logout. No additional token is persisted or exported.
+- Request preview redacts credentials. Three boxes show request, provider and
+  actual HTTP response. Response JSON uses textContent, not interpreted HTML.
+- Contacts are loaded by a normal real login and kept as page-memory identifiers.
+  New project selection clears contacts, token and response.
+- Account/project changes clear prior private responses. Revision guards prevent
+  late responses from repopulating the panel after a storage/logout change.
+- Local validation says Not sent. Network failures say No HTTP response.
+  404/500 are not labeled as successful authentication/security proofs.
+- Existing Supabase schema, RLS, auth settings and static-only server retained.
+
+STRUCTURAL / FIXTURE CHECKS
+- 82 Node checks passed: prior coverage plus request building for all actions,
+  filled-but-unchecked bearer, sender derivation vs explicit forgery attempt,
+  missing-token/unknown-action validation, hidden credential previews and honest
+  401/403/empty-array/malformed-success/configuration-failure descriptions.
+- 71 isolated DOM checks passed: prior mailbox checks plus in-page controls,
+  masked token, actual fixture request bodies/headers, optional authentication,
+  read/send while normal page signed out, sender/inbox boundaries, no token
+  in preview/export, local validation, provider failure vs network failure,
+  account-change clearing and late API response suppression.
+- Those page checks use fixture HTTP, not real browser rendering or live Auth.
+
+LIVE PROVIDER CHECKS — 15/15 PASSED
+Using the SAME pure request builder and API client as the panel:
+- Alice/Bob login: 200.
+- Unchecked bearer despite populated token value: real inbox 401 / 42501.
+- Attached Alice bearer: 200, Alice owner.
+- Built-in send request: 200, Alice sender / Bob recipient.
+- Bob reads delivered note: 200.
+- Selected Bob inbox with Bob token: 200, known note exists.
+- Same Bob inbox with Alice token: 200 [].
+- Claimed Bob sender with Alice token: 403 / 42501.
+- No-token send: 401; absence of unsigned message confirmed.
+- Invalid pasted token: 401 from provider (not invented locally).
+- Alice logout: 204.
+- Copied bearer read after logout: 200, Alice owner.
+- Copied bearer SEND after logout: 200, Alice sender.
+- Bob sees copied-bearer send and no unsigned message: 200.
+- Real-token request preview inspected in memory: full tokens absent.
+- Two invented playground-check notes remain for rehearsal.
+- Cleanup signs out test sessions. Credentials only in process memory; status/
+  pass-fail output contains no password/JWT/refresh token.
+
+LIMITS
+Graphical browser automation remains unavailable; no visual screenshot/rehearsal
+claim. The panel handlers are DOM tested and their requests live-provider tested
+separately. Natural expiry/macOS are still not tested.
+The external Postman artifacts remain optional reference files; the current
+presentation and setup guides use API-PLAYGROUND.txt inside the browser.
+Google remains a teammate's topic.

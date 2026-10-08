@@ -17,6 +17,8 @@ export const STATIC_FILES = Object.freeze([
   ['/js/constants.js', 'js/constants.js'],
   ['/js/reports.js', 'js/reports.js'],
   ['/js/messaging.js', 'js/messaging.js'],
+  ['/js/playground.js', 'js/playground.js'],
+  ['/js/playground-request.js', 'js/playground-request.js'],
   ['/js/settings.js', 'js/settings.js'],
   ['/js/state.js', 'js/state.js'],
   ['/js/token-lab.js', 'js/token-lab.js'],

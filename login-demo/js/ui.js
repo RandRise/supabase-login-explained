@@ -30,6 +30,7 @@ export function clearInbox() {
   select('#compose-form').reset();
   select('#send-status').textContent = '';
   select('#inbox-status').textContent = '';
+  clearApiResponse();
 }
 
 export function renderApp() {
@@ -52,9 +53,18 @@ export function renderApp() {
       element.disabled = state.busy || signedIn;
     });
   select('#import-config').disabled = state.busy || signedIn;
+  select('#api-send').disabled = state.busy || !state.config;
+  select('#api-use-session').disabled = state.busy || !signedIn;
+  select('#api-form')
+    .querySelectorAll('input, select, textarea')
+    .forEach((element) => {
+      element.disabled = state.busy;
+    });
+  select('#api-token').disabled = state.busy || !select('#api-attach-token').checked;
 }
 
 export function renderContacts() {
+  renderApiContacts(state.contacts);
   const recipient = select('#recipient');
   const previous = recipient.value;
   recipient.replaceChildren();
@@ -172,4 +182,50 @@ export function downloadFile(name, value) {
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), MILLISECONDS_PER_SECOND);
+}
+
+export function clearApiResponse() {
+  state.apiRevision++;
+  select('#api-http-status').textContent = 'Not sent';
+  select('#api-http-status').className = 'http-status';
+  select('#api-server-step').textContent = 'Not sent yet';
+  select('#api-result').textContent = 'Send a request to see what Supabase returns.';
+  select('#api-response').textContent = 'No response yet.';
+}
+
+export function renderApiContacts(contacts) {
+  state.apiContacts = [...contacts];
+  for (const selector of ['#api-recipient', '#api-target', '#api-sender']) {
+    const input = select(selector);
+    const previous = input.value;
+    input.replaceChildren();
+    if (!contacts.length) {
+      const placeholder = createElement('option', 'Sign in once to load contacts');
+      placeholder.value = '';
+      input.append(placeholder);
+      continue;
+    }
+    for (const contact of contacts) {
+      const option = createElement('option', contact.display_name);
+      option.value = contact.user_id;
+      input.append(option);
+    }
+    if (contacts.some((contact) => contact.user_id === previous)) {
+      input.value = previous;
+    } else {
+      input.value =
+        contacts.find((contact) => contact.user_id !== state.session?.user.id)?.user_id ||
+        contacts[0].user_id;
+    }
+  }
+}
+
+export function clearApiPlayground() {
+  select('#api-form').reset();
+  renderApiContacts([]);
+  select('#api-token').value = '';
+  select('#api-attach-token').checked = false;
+  select('#api-auth-step').textContent = 'No user token';
+  select('#api-request').textContent = 'Choose an action to preview the request.';
+  clearApiResponse();
 }

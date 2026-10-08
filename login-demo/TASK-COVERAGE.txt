@@ -22,10 +22,11 @@ How does the site remember login across pages?
 Find and decode a real Supabase token?
 - Observe: DevTools Storage and the local decoder in PRESENTATION.txt.
 - Decode sub/email/role/exp; do not claim decoding verifies a signature.
-- Raw-token and copied-token panels were removed from the product page.
+- The old raw-token/replay panels remain removed. A single API playground
+  provides masked token input, request previews and actual server responses.
 
 What can an attacker do with a stolen token?
-- Observe in Postman: a copied Alice bearer token reads Alice's inbox and sends
+- Observe in the built-in API playground: a copied Alice bearer token reads Alice's inbox and sends
   as Alice without a password. Same for Bob's token and Bob's permissions.
 - Live checks confirmed copied-token read after logout; JWT remains usable
   until expiry in this project's Data API behavior.
@@ -47,7 +48,7 @@ Google sign-in without revealing Google's password?
 Dummy page feasible with time/resources?
 - Yes: a static browser page, real separate Supabase test project and two
   invented accounts. No application server, paid AI API, build step or package
-  install is needed. Postman is optional for use, recommended for presentation.
+  install is needed. The API playground is built in; no separate Postman app is needed.
 - Rehearse on the presentation laptop with internet; allow about five minutes
   for the walkthrough. This setup is already installed in our test project.
 

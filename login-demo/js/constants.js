@@ -26,3 +26,11 @@ export const REQUEST_TIMEOUT_MS = 10_000;
 export const SUBJECT_LIMIT = 120;
 export const BODY_LIMIT = 4000;
 export const MILLISECONDS_PER_SECOND = 1000;
+
+// Only fixed demo endpoints are available in the in-page API client.
+export const API_ACTIONS = Object.freeze({
+  inbox: { method: 'POST', path: INBOX_PATH },
+  send: { method: 'POST', path: SEND_PATH },
+  'other-inbox': { method: 'GET', path: MESSAGES_PATH },
+  forge: { method: 'POST', path: MESSAGES_PATH },
+});

@@ -38,27 +38,29 @@ Say: "These are readable claims, not the password. Decoding does not verify
 the signature. Supabase verifies the token before the request reaches RLS."
 Keep the full credential out of shared notes/recordings.
 
-3:00 — POSTMAN
-Prepare POSTMAN.txt before the meeting.
-Send the no-token inbox request: show 401.
-Add a Bob bearer token: show Bob's inbox.
-Switch to Alice's token: show Alice's inbox.
-Optionally show Alice's direct Bob-inbox query returning [] and the forged
-Bob sender insert returning 403. First show Bob's same query has a real note.
+3:00 — BUILT-IN API PLAYGROUND
+No separate Postman app needed. Follow API-PLAYGROUND.txt.
+Open API playground, leave Attach bearer token unchecked, Read my inbox:
+show the missing Authorization header and the actual HTTP 401.
+Sign in as Bob, click Use signed-in token, repeat: show HTTP 200 and Bob's inbox.
+Uncheck the token and repeat the SAME request: 401 again.
+Say: "The token is the credential on this request. The server decides what
+this identity may read. The local Node server is only serving the page."
 
-4:00 — TOKEN THEFT
-Use a copied Alice token in Postman while the browser is signed out.
-Read Alice's inbox; optionally send another harmless invented note to Bob.
+4:00 — TOKEN THEFT / ACCESS BOUNDARY
+Sign in as Alice, Use signed-in token, then sign out on the normal page.
+The page inbox clears, but the masked token attached in the panel remains.
+Read my inbox may still return Alice's notes until JWT expiry.
+Optionally send another harmless invented note to Bob through the panel.
+Say: "Someone with this bearer token can act as Alice without her password.
+Signing out clears the browser session and revokes its refresh capability;
+it does not erase an access-token copy already held elsewhere."
 
-Say: "Whoever holds this bearer token can use Alice's permissions without
-knowing her password. They cannot use it to read Bob's inbox, forge Bob's
-sender identity, discover Alice's original password, or create a valid Bob
-token by editing the claims. An access token alone cannot refresh a session."
-
-Optional: Postman logout, then repeat read with the copied JWT.
-Say: "Logout clears the browser and revokes this session's refresh capability.
-The access JWT can still work until expiry. Removing it from the page does
-not erase a copy someone already holds."
+Optional: Read a selected person's inbox > Bob, with Alice token: 200 [].
+First show Bob can read a known existing note with Bob's token.
+Try sending as another person > Claimed sender Bob > To Alice, with Alice
+token: 403. These are separate database permissions, not just login status.
+Clear token when finished. The panel never prints or exports the credential.
 
 4:45 — HANDOFF
 "My teammate will explain Google sign-in. This demo covers password login,

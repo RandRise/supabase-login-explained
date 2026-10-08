@@ -1,3 +1,7 @@
+OPTIONAL HISTORICAL REFERENCE
+The current presentation uses API playground inside the page.
+Start with API-PLAYGROUND.txt; no Postman installation is required.
+
 POSTMAN — SAME API, WITHOUT THE PAGE
 
 Use the desktop Postman app. Import:

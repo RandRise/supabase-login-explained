@@ -14,6 +14,7 @@
       >
       <div class="header-actions">
         <span id="connection" class="connection">Not configured</span>
+        <button id="api-open" class="quiet" type="button">API playground</button>
         <button id="setup-open" class="quiet" type="button">Connection settings</button>
         <button id="logout" class="quiet" type="button" hidden>Sign out</button>
       </div>
@@ -106,6 +107,114 @@
           </section>
         </div>
       </section>
+      <details id="api-playground" class="api-playground">
+        <summary>
+          <strong>API playground</strong><span>Send a request with or without a token</span>
+        </summary>
+        <div class="playground-body">
+          <div class="playground-heading">
+            <div>
+              <span class="eyebrow">TRY THE REQUEST YOURSELF</span>
+              <h2>What does the token change?</h2>
+            </div>
+            <span class="badge">Real Supabase requests</span>
+          </div>
+          <p class="small muted">
+            This request uses the token below, independently of the page login. Tokens stay masked
+            and are not saved by this panel.
+          </p>
+          <div class="request-flow" aria-label="Request flow">
+            <div>
+              <span class="flow-number">1</span><strong>Browser request</strong
+              ><span id="api-auth-step">No user token</span>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div>
+              <span class="flow-number">2</span><strong>Supabase</strong
+              ><span id="api-server-step">Not sent yet</span>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div>
+              <span class="flow-number">3</span><strong>Response</strong
+              ><span id="api-http-status" class="http-status">Not sent</span>
+            </div>
+          </div>
+          <div class="playground-grid">
+            <form id="api-form" class="api-controls">
+              <label for="api-action">Action</label>
+              <select id="api-action">
+                <option value="inbox">Read my inbox</option>
+                <option value="send">Send a note</option>
+                <option value="other-inbox">Read a selected person's inbox</option>
+                <option value="forge">Try sending as another person</option>
+              </select>
+              <div class="endpoint">
+                <span id="api-method">POST</span
+                ><code id="api-path">/rest/v1/rpc/team3_read_inbox</code>
+              </div>
+              <label class="checkbox-label" for="api-attach-token"
+                ><input id="api-attach-token" type="checkbox" />Attach bearer token</label
+              >
+              <label for="api-token">Bearer token</label>
+              <input
+                id="api-token"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Paste a test token or use the signed-in session"
+                disabled
+              />
+              <div class="buttons token-buttons">
+                <button id="api-use-session" type="button" class="quiet">
+                  Use signed-in token
+                </button>
+                <button id="api-clear-token" type="button" class="quiet">Clear token</button>
+              </div>
+              <p class="small muted">
+                The token stays in this panel until cleared or reloaded, even after signing out.
+              </p>
+              <div id="api-target-controls" hidden>
+                <label for="api-target">Whose inbox?</label>
+                <select id="api-target">
+                  <option value="">Sign in once to load contacts</option>
+                </select>
+              </div>
+              <div id="api-compose" hidden>
+                <div id="api-sender-controls" hidden>
+                  <label for="api-sender">Claimed sender</label>
+                  <select id="api-sender">
+                    <option value="">Sign in once to load contacts</option>
+                  </select>
+                </div>
+                <label for="api-recipient">To</label>
+                <select id="api-recipient">
+                  <option value="">Sign in once to load contacts</option>
+                </select>
+                <label for="api-subject">Subject</label>
+                <input id="api-subject" type="text" maxlength="120" value="Rehearsal check" />
+                <label for="api-note">Note</label>
+                <textarea id="api-note" rows="3" maxlength="4000">
+Shall we rehearse at 10:00?</textarea
+                >
+              </div>
+              <button id="api-send" type="submit" class="primary">
+                Send request <span>→</span>
+              </button>
+            </form>
+            <div class="api-output">
+              <h3>Request preview <span class="small muted">Credentials hidden</span></h3>
+              <pre id="api-request" tabindex="0"></pre>
+              <h3>Server response</h3>
+              <p id="api-result" class="small" role="status" aria-live="polite">
+                Send a request to see what Supabase returns.
+              </p>
+              <pre id="api-response" tabindex="0" aria-label="Server response JSON">
+No response yet.</pre
+              >
+            </div>
+          </div>
+        </div>
+      </details>
       <footer>Private Notes<span>Mayerfeld Practicum · Supabase demo</span></footer>
     </main>
     <dialog id="setup">

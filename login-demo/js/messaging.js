@@ -1,3 +1,4 @@
+import { updatePlayground } from './playground.js';
 import { inboxValid } from '../core.mjs';
 import { CONTACTS_PATH } from './constants.js';
 import { state, getToken } from './state.js';
@@ -54,6 +55,7 @@ export async function loadInbox(api) {
     state.messages = inbox.data.messages;
     state.inboxLoaded = true;
     renderContacts();
+    updatePlayground();
     renderInbox();
     select('#inbox-status').textContent = 'Updated just now.';
   } catch (error) {

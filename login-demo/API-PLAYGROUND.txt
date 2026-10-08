@@ -1,0 +1,77 @@
+API PLAYGROUND — EVERYTHING INSIDE THE DEMO
+
+No Postman installation or separate website is needed.
+Open the app, click API playground in the top bar.
+
+READ WITHOUT A TOKEN
+1. Action: Read my inbox.
+2. Leave Attach bearer token unchecked.
+3. Send request.
+   The preview has no Authorization header.
+   Supabase returns HTTP 401. The server response is real, not a simulation.
+
+READ WITH BOB'S TOKEN
+1. Sign in as Bob on the normal page.
+2. Open API playground > Use signed-in token.
+   The token fills the masked field and Attach bearer token turns on.
+3. Action: Read my inbox > Send request.
+   Expect HTTP 200 and Bob's notes.
+4. Uncheck Attach bearer token and repeat: HTTP 401.
+   Same endpoint, different credential.
+
+ALICE / BOB MESSAGING
+Use the normal inbox and Reply buttons, or in API playground:
+- Action: Send a note.
+- Attach the signed-in user's token.
+- Choose the other recipient, enter a subject/note, Send request.
+- HTTP 200 / sent:true confirms the server stored it.
+- The recipient signs in and refreshes their inbox.
+Sign in once to load the two contact choices. Their identifiers stay only in
+the panel's page memory; they contain no password or credential.
+An unsigned send with known contact choices gets 401 and inserts no note.
+
+SHOW WHAT A STOLEN TOKEN PERMITS
+As Alice: Use signed-in token, then Sign out.
+The normal inbox clears. The separately attached token remains in this panel.
+Read my inbox / Send request may still return Alice's notes until JWT expiry.
+That copied bearer token can also send a note as Alice without the password.
+Clear token or reload to remove it from the panel.
+It is never stored as an extra session, copied to the clipboard or exported.
+
+OPTIONAL: WHAT IT CANNOT DO
+First ensure Alice sent a note to Bob.
+- Attach Bob's token.
+- Action: Read a selected person's inbox > Bob > Send request.
+  HTTP 200 with a known existing Bob note.
+- Attach Alice's token (sign in as Alice and Use signed-in token).
+- Request the SAME Bob inbox.
+  HTTP 200 []: row level security hides Bob's notes from Alice.
+  This is not HTTP 401; an empty result needs that known-note baseline.
+- Action: Try sending as another person.
+  Claimed sender: Bob. To: Alice. Attach ALICE token.
+  Subject/note: harmless invented text.
+  Expect HTTP 403: Alice cannot insert a message claiming Bob as sender.
+
+PRESENTATION
+The three boxes show Browser request -> Supabase -> Response.
+The request preview displays method, endpoint, payload and redacted headers.
+The response shows the actual status and JSON from Supabase.
+This is a small real API client, not pretend authentication on the local server.
+The panel's chosen token controls the request independently of page login.
+
+TOKEN INPUT
+Use signed-in token is the easiest option. Or check Attach bearer token and
+paste a test access token; both a bare JWT and "Bearer ..." are accepted.
+No raw-token reveal button. Header previews never contain the full token.
+Do not paste a secret/service_role project key or a refresh token as bearer.
+The app's existing stored session is still inspectable in browser DevTools.
+PRESENTATION.txt covers locally decoding claims for the assignment.
+
+ERRORS
+401: Supabase rejects authentication; inspect the returned error.
+403: authenticated action refused.
+200 []: no visible matching rows; not necessarily proof of security alone.
+404/500: endpoint/configuration/server issue, not the intended auth proof.
+No HTTP response: network/timeout, not an access decision.
+Clearing/changing account or project clears previous private responses;
+late responses from the prior state are not displayed.

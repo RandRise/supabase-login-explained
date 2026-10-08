@@ -25,9 +25,10 @@ Sign in separately using the same invented Alice/Bob credentials.
 Use the existing Supabase project; no new users or SQL required.
 Alice sends to Bob, sign out, Bob reads and replies, sign out, Alice reads.
 
-POSTMAN ON THE MAC
-Import postman-collection.json and postman-environment.template.json.
-Follow POSTMAN.txt. Add local password/token values on this laptop only.
+API PLAYGROUND ON THE MAC
+Open API playground in the page. No separate app or token setup required.
+Sign in > Use signed-in token, then compare requests with/without it.
+Follow API-PLAYGROUND.txt. Tokens stay masked and in this page only.
 
 UPDATES
 Stop the server, run git pull from the repository, then start it again.

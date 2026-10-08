@@ -32,5 +32,5 @@ ONLY IF YOU CREATE YOUR OWN SEPARATE TEST PROJECT
    Save connection. The anonymous inbox check should receive 401.
 5. Sign in and rehearse. Empty inboxes are normal until a note is sent.
 
-Postman is optional for using the page, but useful for showing token access.
-Read POSTMAN.txt and PRESENTATION.txt. TASK-COVERAGE.txt checks the assignment.
+API playground is built into the page to show requests with/without a token.
+No separate Postman app required. Read API-PLAYGROUND.txt and PRESENTATION.txt. TASK-COVERAGE.txt checks the assignment.

@@ -28,6 +28,8 @@ export const state = {
   messages: [],
   busy: false,
   inboxLoaded: false,
+  apiContacts: [],
+  apiRevision: 0,
 };
 
 export function isStoredSessionValid(session) {

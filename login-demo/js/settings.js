@@ -1,3 +1,4 @@
+import { updatePlayground } from './playground.js';
 import {
   SESSION_KEY,
   CONFIG_KEY,
@@ -9,7 +10,14 @@ import {
 import { validateConfig } from '../core.mjs';
 import { state, saveStorage, readStorage, isStoredSessionValid } from './state.js';
 import { getApiError } from './api.js';
-import { select, showNotice, renderApp, clearInbox, downloadFile } from './ui.js';
+import {
+  select,
+  showNotice,
+  renderApp,
+  clearInbox,
+  clearApiPlayground,
+  downloadFile,
+} from './ui.js';
 
 export function connectProject(next) {
   if (state.session) {
@@ -18,9 +26,11 @@ export function connectProject(next) {
   saveStorage(CONFIG_KEY, next);
   state.config = next;
   clearInbox();
+  clearApiPlayground();
   select('#project-url').value = next.url;
   select('#public-key').value = next.key;
   renderApp();
+  updatePlayground();
 }
 
 export async function checkConnection(api) {
@@ -114,6 +124,7 @@ export function handleStorageChange(event) {
     } catch {
       state.config = null;
     }
+    clearApiPlayground();
     select('#project-url').value = state.config?.url || '';
     select('#public-key').value = state.config?.key || '';
   }
