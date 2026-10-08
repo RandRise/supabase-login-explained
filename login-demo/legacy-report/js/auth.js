@@ -1,9 +1,8 @@
-import { SESSION_KEY, LOGIN_PATH, LOGOUT_PATH } from './constants.js';
+import { SESSION_KEY, LOGIN_PATH, REFRESH_PATH, LOGOUT_PATH } from './constants.js';
 import { decode } from '../core.mjs';
 import { state, saveStorage } from './state.js';
 import { getApiError } from './api.js';
-import { loadInbox } from './messaging.js';
-import { select, showNotice, renderApp, clearInbox } from './ui.js';
+import { select, showNotice, renderApp, clearReport } from './ui.js';
 
 export function applySession(data) {
   let next = null;
@@ -21,7 +20,8 @@ export function applySession(data) {
   }
   saveStorage(SESSION_KEY, next);
   state.session = next;
-  clearInbox();
+  clearReport();
+  select('#raw-token').value = '';
   renderApp();
 }
 
@@ -40,9 +40,10 @@ export async function signIn(api) {
       throw Error(getApiError(result));
     }
     applySession(result.data);
-    select('#password').value = '';
-    showNotice('Signed in.');
-    await loadInbox(api);
+    select('#restore-state').textContent =
+      'Signed in during this page load. Reload to restore the saved session.';
+    select('#test-results').textContent = '';
+    showNotice('Signed in successfully.');
   } finally {
     select('#password').value = '';
   }
@@ -54,8 +55,10 @@ export async function signOut(api) {
   }
   const original = state.session;
   const target = { ...state.config };
-  // Clear the mailbox immediately, even if Supabase cannot be reached.
+  // Clear browser state immediately, even if the provider is unreachable.
   applySession(null);
+  select('#restore-state').textContent =
+    'Browser session cleared. A captured access-token copy stays in memory until you clear it or reload.';
   try {
     const result = await api.request(LOGOUT_PATH, {
       method: 'POST',
@@ -65,10 +68,31 @@ export async function signOut(api) {
     showNotice(
       result.ok
         ? 'Signed out.'
-        : 'Browser signed out. Supabase logout was not confirmed: ' + getApiError(result),
+        : 'Browser signed out, but Supabase logout was not confirmed: ' + getApiError(result),
       !result.ok,
     );
   } catch (error) {
     showNotice('Browser signed out. Supabase logout was not confirmed. ' + error.message, true);
   }
+}
+
+export async function refreshSession(api) {
+  const expected = state.session;
+  const target = state.config;
+  if (!expected) {
+    throw Error('Sign in first.');
+  }
+  const result = await api.request(REFRESH_PATH, {
+    method: 'POST',
+    body: { refresh_token: expected.refresh_token },
+    target,
+  });
+  if (state.session !== expected || state.config !== target) {
+    return;
+  }
+  if (!result.ok) {
+    throw Error(getApiError(result));
+  }
+  applySession(result.data);
+  showNotice('Session refreshed. The token pair and expiry have changed.');
 }

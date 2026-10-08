@@ -1,59 +1,59 @@
 import {
   SESSION_KEY,
   CONFIG_KEY,
-  BASE_KEY,
   CONNECTION_FILE_FORMAT,
   SETTINGS_FILENAME,
   PUBLIC_CONFIG_PATH,
   MAX_SETTINGS_FILE_BYTES,
 } from './constants.js';
-import { validateConfig, actionVerdict } from '../core.mjs';
+import { validateConfig } from '../core.mjs';
 import { state, saveStorage, readStorage, isStoredSessionValid } from './state.js';
 import { getApiError } from './api.js';
-import { select, showNotice, renderApp, clearReport, displayResult, downloadFile } from './ui.js';
+import { select, showNotice, renderApp, clearInbox, downloadFile } from './ui.js';
 
 export function connectProject(next) {
   if (state.session) {
     throw Error('Sign out before changing connection settings.');
   }
   saveStorage(CONFIG_KEY, next);
-  saveStorage(BASE_KEY, null);
   state.config = next;
-  state.captured = null;
-  displayResult('#replay-state', 'No copy captured.');
-  select('#test-results').textContent = '';
-  select('#anonymous-result').textContent = 'No request sent yet.';
-  select('#project-url').value = state.config.url;
-  select('#public-key').value = state.config.key;
+  clearInbox();
+  select('#project-url').value = next.url;
+  select('#public-key').value = next.key;
   renderApp();
 }
 
 export async function checkConnection(api) {
-  const result = await api.getReport();
-  const verdict = actionVerdict(result);
-  select('#setup-health').textContent =
-    verdict === 'DENIED'
-      ? 'Report endpoint responded HTTP ' +
-        result.status +
-        ' to an anonymous request. Sign in to confirm the report can be downloaded.'
-      : result.ok
-        ? 'Unexpected anonymous response. Check the report function before presenting.'
-        : 'Connection saved. Report check returned HTTP ' +
-          result.status +
-          ': ' +
-          getApiError(result) +
-          '. Run the SQL in this project and recheck.';
+  const result = await api.getInbox();
+  const expectedDenial = result.status === 401 && result.data?.code === '42501';
+  select('#setup-health').textContent = expectedDenial
+    ? 'Inbox endpoint is available. Sign in to read your notes.'
+    : 'Inbox check returned HTTP ' +
+      result.status +
+      ': ' +
+      getApiError(result) +
+      '. Check add-messaging.sql and your project settings.';
   showNotice(
-    verdict === 'DENIED'
-      ? 'Connection saved. Sign in to access your report.'
-      : 'Connection saved; the report endpoint needs checking.',
-    verdict !== 'DENIED',
+    expectedDenial
+      ? 'Connection saved. Sign in to open your inbox.'
+      : 'Connection saved; the inbox endpoint needs checking.',
+    !expectedDenial,
   );
 }
 
 export async function saveConnection(api) {
   connectProject(validateConfig(select('#project-url').value, select('#public-key').value));
   await checkConnection(api);
+}
+
+function parsePublicSettings(data) {
+  if (
+    data?.format !== CONNECTION_FILE_FORMAT ||
+    Object.keys(data).some((key) => !['format', 'url', 'key'].includes(key))
+  ) {
+    throw Error('Import only public connection settings. Session exports are refused.');
+  }
+  return validateConfig(data.url, data.key);
 }
 
 export async function importSettings(api) {
@@ -65,14 +65,7 @@ export async function importSettings(api) {
     if (file.size > MAX_SETTINGS_FILE_BYTES) {
       throw Error('Select the small public connection settings file.');
     }
-    const data = JSON.parse(await file.text());
-    if (
-      data.format !== CONNECTION_FILE_FORMAT ||
-      Object.keys(data).some((k) => !['format', 'url', 'key'].includes(k))
-    ) {
-      throw Error('Import only a public connection settings file. Session exports are refused.');
-    }
-    connectProject(validateConfig(data.url, data.key));
+    connectProject(parsePublicSettings(JSON.parse(await file.text())));
     await checkConnection(api);
   } finally {
     select('#config-file').value = '';
@@ -89,18 +82,13 @@ export async function loadLocalConnection() {
       return;
     }
     const data = await result.json();
-    if (
-      state.config ||
-      state.busy ||
-      data.format !== CONNECTION_FILE_FORMAT ||
-      Object.keys(data).some((k) => !['format', 'url', 'key'].includes(k))
-    ) {
+    if (state.config || state.busy) {
       return;
     }
-    connectProject(validateConfig(data.url, data.key));
-    showNotice('Test project connected. Sign in to access your report.');
+    connectProject(parsePublicSettings(data));
+    showNotice('Test project connected. Sign in to open your inbox.');
   } catch {
-    /* A clone without local settings uses the normal connection dialog. */
+    // A fresh clone can use the connection dialog instead.
   }
 }
 
@@ -116,27 +104,25 @@ export function exportSettings() {
 }
 
 export function handleStorageChange(event) {
-  if (![SESSION_KEY, CONFIG_KEY, BASE_KEY].includes(event.key) && event.key !== null) {
-    return;
+  if (![SESSION_KEY, CONFIG_KEY].includes(event.key) && event.key !== null) {
+    return false;
   }
   if (event.key === CONFIG_KEY || event.key === null) {
     try {
-      const storedConfig = readStorage(CONFIG_KEY);
-      state.config = storedConfig ? validateConfig(storedConfig.url, storedConfig.key) : null;
+      const stored = readStorage(CONFIG_KEY);
+      state.config = stored ? validateConfig(stored.url, stored.key) : null;
     } catch {
       state.config = null;
     }
-    state.captured = null;
     select('#project-url').value = state.config?.url || '';
     select('#public-key').value = state.config?.key || '';
   }
-  if ([SESSION_KEY, CONFIG_KEY].includes(event.key) || event.key === null) {
-    state.session = readStorage(SESSION_KEY);
-    if (!isStoredSessionValid(state.session)) {
-      state.session = null;
-    }
-    clearReport();
+  state.session = readStorage(SESSION_KEY);
+  if (!isStoredSessionValid(state.session)) {
+    state.session = null;
   }
+  clearInbox();
   renderApp();
-  showNotice('Session or settings changed in another tab.');
+  showNotice('Session or settings changed in another tab. Refresh the inbox if needed.');
+  return true;
 }

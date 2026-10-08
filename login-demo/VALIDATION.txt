@@ -79,3 +79,83 @@ a graphical-browser/Mac rehearsal is still needed.
   both logins, owner reports, anonymous denial, tampering, refresh, logout and
   copied-token replay. Test sessions were signed out; no credentials saved.
 - No database schema, auth settings, keys or RLS policies changed for this refactor.
+
+
+9 OCTOBER 2026 — ALICE/BOB MESSAGING (CURRENT EXERCISE)
+
+IMPLEMENTED
+- Normal sign-in, inbox, compose and reply. Removed report/download controls,
+  copied-token/raw-token panels, Google section and second-account verifier
+  from the active page. Tokens are inspected in DevTools or Postman.
+- New additive contacts/messages tables and inbox/send invoker functions.
+  Existing report table, functions and earlier course exercises are preserved.
+  A complete runnable report snapshot is in legacy-report (commit e185723).
+- Recipients alone can SELECT stored messages. INSERT requires the verified
+  user's id as sender. The send RPC derives the sender via auth.uid().
+- Two invented contacts only; no browser access to auth.users, no UPDATE/DELETE.
+  Browser insert grants exclude id/timestamp. Empty search_path, explicit execute
+  grants, RLS enabled, recipient/sender indexes.
+- Public settings export remains compatible. Added empty-variable Postman
+  collection/environment template and updated Mac/setup/presentation docs.
+
+STRUCTURAL / FIXTURE CHECKS
+- 64 Node checks: decoder/config safety, inbox shape and owner matching,
+  omitted vs attached bearer credentials, send route/body, static routes,
+  server-only file refusal and static-only server behavior.
+- 36 isolated DOM checks load the real module graph with fixture HTTP:
+  login/logout, password clearing, session storage/restoration, contacts,
+  compose delivery, reply, account switching, text-only HTML-looking messages,
+  wrong-owner response refusal, refresh recovery, public-only settings export,
+  failed login, public config bootstrap and late-response/cross-tab logout.
+- 27 local PostgreSQL/PGlite checks execute add-messaging.sql with fixture
+  auth.uid(): actual insertion/read/reply, recipient RLS both directions,
+  forged sender refusal, anonymous denial, write grants, validation, function
+  attributes and enabled RLS. These are not live JWT or HTTP tests.
+- Preserved report snapshot: its 49 Node checks passed independently.
+
+LIVE SUPABASE — 23/23 HTTP CHECKS PASSED
+- Alice/Bob real password login: 200. Decoded real JWT identity/expiry checked;
+  no password field in claims. Decoding alone does not verify a signature.
+- Directory: 200, two invented contacts.
+- Inbox without token: 401 / 42501. Send without token: 401.
+- Alice sends to Bob: 200, server reports Alice sender.
+- Bob inbox contains the delivered note. Alice inbox excludes it.
+- Bob direct SELECT sees known existing message(s); Alice's same recipient
+  query gives 200 []. This is RLS filtering, not HTTP 401.
+- Forged Bob sender with Alice token: 403 / 42501.
+- Bob reply: 200; Alice inbox contains reply.
+- Bob's direct Alice-inbox query: 200 [].
+- Blank subject: 400 / 22023.
+- Edited sub and exp JWT: 401 each.
+- Access JWT used as refresh token: 400.
+- Genuine refresh: 200; logout: 204.
+- Copied access JWT reads Alice inbox after logout: 200.
+- Logged-out refresh token: 400. Test sessions signed out during cleanup.
+- Two invented delivery-check messages remain for rehearsal.
+- Passwords/tokens stayed in process memory. Logs contain check names/status/
+  pass-fail only; no credentials or storage dumps saved.
+
+DATABASE INSPECTION / ADVISOR
+- Confirmed RLS on both new tables and the earlier notes table.
+- Confirmed recipient SELECT and sender INSERT policies, SECURITY INVOKER
+  and empty search_path on both RPCs.
+- Security advisor: one existing Auth warning, leaked password protection off.
+  No new messaging RLS/function security notices. Auth settings were unchanged.
+  Remediation/reference:
+  https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Supabase changelog and current RLS/functions/Auth docs reviewed. PostgreSQL
+  17.11 changelog concerns ltree/custom operators/legacy PGP/GiST NaN usage;
+  the new schema uses none of those features.
+
+LIMITS / PRESENTATION REHEARSAL
+- Browser automation still fails before opening a surface. No screenshot or
+  graphical layout verification claimed. Fixture DOM checks are not a browser.
+- Not run on macOS or inside desktop Postman. The endpoints are live tested;
+  collection JSON/schema and request variables are checked structurally.
+- Natural expiry not tested by waiting. Edited expiry is signature-tampering
+  evidence, not a genuine elapsed-expiry test.
+- No Google OAuth in this page; teammate must cover that assignment item.
+- Password hashing is a provider-documented explanation, not a live hash demo.
+- localStorage and manual re-login after expiry are intentional demo choices.
+- RLS protects users from each other; project administrators can access data.
+  This is not an end-to-end encrypted messenger or a production security audit.

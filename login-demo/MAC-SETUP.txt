@@ -1,46 +1,39 @@
-ON YOUR MAC — ABOUT TWO MINUTES AFTER NODE IS INSTALLED
+ON YOUR MAC
 
-1. Install Node.js LTS from https://nodejs.org/ (choose the macOS installer).
-2. Open Terminal and paste these three lines:
+1. Install Node.js 20 or newer from https://nodejs.org/.
+2. Open Terminal:
 
    git clone https://github.com/RandRise/supabase-login-explained.git
    cd supabase-login-explained/login-demo
    npm start
 
-3. Open http://127.0.0.1:8772 in Chrome, Safari or Firefox.
-   Leave Terminal open. Ctrl+C stops the server.
+3. Open http://127.0.0.1:8772 and leave Terminal open.
+   Ctrl+C stops the server. No npm install required.
 
-If git asks for Apple's command-line tools, install them and repeat step 2.
-Alternative: GitHub > Code > Download ZIP. Extract it, open Terminal in the
-login-demo folder, and run node server.mjs. No npm install step is needed.
+If git asks for Apple's command-line tools, install them and retry.
+Or download GitHub > Code > Download ZIP, extract it and run npm start from
+login-demo. The ZIP prepared in this chat includes public connection settings;
+GitHub's automatically generated ZIP does not.
 
 ON THE ORIGINAL LAPTOP
-In the app: Connection settings > Export settings.
-Move reports-connection.public.json to the Mac (AirDrop, USB, or a private message).
-It includes only the project URL and publishable key, not passwords or tokens.
+Connection settings > Export settings.
+Move inbox-connection.public.json to the Mac.
 
-BACK ON THE MAC
-Connection settings > Import settings > select that JSON file.
-Close settings and sign in as Alice using the same demo password.
-Click Download my report, then test Request report without a token.
-You use the existing Supabase project; no SQL, new users or new project required.
-If the first laptop has not been configured yet, follow START-HERE.txt first.
+ON THE MAC
+Connection settings > Import settings > choose the public JSON file.
+Sign in separately using the same invented Alice/Bob credentials.
+Use the existing Supabase project; no new users or SQL required.
+Alice sends to Bob, sign out, Bob reads and replies, sign out, Alice reads.
 
-BEFORE YOUR PRESENTATION
-Use this laptop/browser to rehearse. Confirm internet access and that Supabase
-is not paused. Share the browser window; keep account settings out of view.
-Sign in first and keep the inspection panel collapsed for the opening screen.
-Tokens captured for replay stay only in memory, so capture again after a reload.
-Normal login is saved in this browser. Private/incognito windows start fresh.
+POSTMAN ON THE MAC
+Import postman-collection.json and postman-environment.template.json.
+Follow POSTMAN.txt. Add local password/token values on this laptop only.
 
-UPDATES LATER
-Stop the server with Ctrl+C. From the repository folder, run git pull, then
-start it again. If you made your own source edits, inspect them before pulling;
-do not reset or discard files blindly.
+UPDATES
+Stop the server, run git pull from the repository, then start it again.
+Inspect your own edits first; do not reset or discard them blindly.
 
-Optional local setup: a presenter may keep login-demo/connection.local.json
-with the same format as the exported public-settings file. The server exposes
-it as /connection.public.json, and the app uses it only when this browser has
-no saved connection. It must contain only format, url and a publishable key.
-The file is ignored by Git. This laptop has one; a fresh clone can use Import
-settings. It never transfers a password or an authenticated session.
+REHEARSAL
+Internet and an active Supabase project are required.
+Check login, delivery, reply, reload and no-token access on the actual Mac.
+The code uses portable Node commands, but we have not run it on macOS.

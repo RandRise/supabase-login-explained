@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "Private Notes — Alice and Bob",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Real Supabase Auth and RLS. Follow POSTMAN.txt. Fill local environment values only. No scripts store tokens. Use the token of the account whose inbox you want; sender identity is determined by the token."
+  },
+  "item": [
+    {
+      "name": "1 · Sign in as Alice",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/v1/token?grant_type=password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@test.invalid\",\n  \"password\": \"{{demo_password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "200. Copy access_token to LOCAL bearer_token and user.id to alice_id. No scripts save credentials."
+      }
+    },
+    {
+      "name": "2 · Sign in as Bob",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/v1/token?grant_type=password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"bob@test.invalid\",\n  \"password\": \"{{demo_password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "200. Copy user.id to bob_id. Use access_token as LOCAL bearer_token to act as Bob."
+      }
+    },
+    {
+      "name": "3 · Read inbox WITHOUT a token",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/rpc/team3_read_inbox",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Expected 401 / 42501. This explicitly omits Authorization."
+      }
+    },
+    {
+      "name": "4 · Read current token owner's inbox",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/rpc/team3_read_inbox",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Expected 200 with owner_id and messages. Alice token = Alice inbox. Bob token = Bob inbox."
+      }
+    },
+    {
+      "name": "5 · Alice sends a note to Bob",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/rpc/team3_send_message",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"p_recipient_id\": \"{{bob_id}}\",\n  \"p_subject\": \"Presentation rehearsal\",\n  \"p_body\": \"Hi Bob, shall we rehearse at 10:00?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Use Alice token. Expected 200 / sent:true. Log in as Bob and use request 4 to see it."
+      }
+    },
+    {
+      "name": "6 · Bob replies to Alice",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/rpc/team3_send_message",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"p_recipient_id\": \"{{alice_id}}\",\n  \"p_subject\": \"Re: Presentation rehearsal\",\n  \"p_body\": \"Hi Alice, yes. See you at 10:00.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Use Bob token. Expected 200 / sent:true. Switch to Alice token and request 4."
+      }
+    },
+    {
+      "name": "7 · Try reading Bob's inbox directly",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/team3_demo_messages?select=id,sender_id,recipient_id,subject,body&recipient_id=eq.{{bob_id}}",
+        "description": "First use Bob token after request 5: 200 with a known existing note. Then Alice token: 200 [] — RLS hides rows; this is not HTTP denial."
+      }
+    },
+    {
+      "name": "8 · Try forging Bob's sender identity",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/team3_demo_messages",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sender_id\": \"{{bob_id}}\",\n  \"recipient_id\": \"{{alice_id}}\",\n  \"subject\": \"Forged sender\",\n  \"body\": \"This must fail with Alice token.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Use Alice token. Expected 403 / 42501. The INSERT policy rejects sender_id != auth.uid()."
+      }
+    },
+    {
+      "name": "9 · Send WITHOUT a token",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/rest/v1/rpc/team3_send_message",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"p_recipient_id\": \"{{bob_id}}\",\n  \"p_subject\": \"Unsigned note\",\n  \"p_body\": \"This must not be delivered.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Expected 401 / 42501. No message is inserted."
+      }
+    },
+    {
+      "name": "10 · Sign out this token's session",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          }
+        ],
+        "url": "{{base_url}}/auth/v1/logout?scope=local",
+        "description": "Expected 204. Does not erase your manually copied bearer_token. Request 4 may still work until this JWT expires; logout revokes refresh capability for this session."
+      }
+    },
+    {
+      "name": "11 · Refresh session (optional)",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "apikey",
+            "value": "{{publishable_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/v1/token?grant_type=refresh_token",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Use a genuine refresh_token from login; expected 200 before logout. Copy the NEW pair to your LOCAL values. A logged-out refresh token is refused. An access JWT is not a refresh token."
+      }
+    }
+  ]
+}

@@ -1,21 +1,19 @@
-Updated the demo so it looks like a normal login page. After signing in you can
-actually download your own report. There is also a button that sends the same
-request without a token, so we can show the server refusing it.
+I updated the demo to a simple Alice/Bob inbox.
 
-The token inspector, copied-token replay and owner-access checks are under
-"Session & access tools". There are no speaking notes on the page now.
+Alice signs in and sends Bob a note. Bob signs in, reads it and replies.
+Alice then signs back in to see the reply. Supabase handles the real login
+and database access rules.
 
-Code: https://github.com/RandRise/supabase-login-explained
-Mac setup: open login-demo/MAC-SETUP.txt. It needs Node.js, but no npm install.
-We can export the public connection settings from the first laptop and import
-them on the Mac, then sign in again. No need to recreate the Supabase project.
+I removed the report download, copied-token panel, raw-token display, Google
+section and second-account verification controls from the page. We'll inspect
+the token in DevTools and use Postman to show what changes with/without it.
 
-If you already set up the earlier version, run add-report-action.sql once in
-the same project's SQL Editor. For a fresh project use setup.sql instead.
-The real Supabase setup is ready. We still need to rehearse signing in and downloading the report before class.
+Repo: https://github.com/RandRise/supabase-login-explained
+Run: open login-demo in Terminal, npm start, then http://127.0.0.1:8772.
+No npm install required. The shareable ZIP includes public project settings.
+For a Git clone, import the public connection settings on the new laptop.
+The demo passwords are provided separately.
 
-Live provider checks are complete: both logins, owner reports, anonymous denial,
-modified-token rejection, refresh and replay after logout passed. The copied
-access token still returned Alice's report after logout; the refresh token was
-refused. We'll show that actual behavior in the presentation. Passwords and
-tokens are not included in the repository or ZIP.
+POSTMAN.txt has the import/setup steps and PRESENTATION.txt has the walkthrough.
+TASK-COVERAGE.txt checks the assignment; Google OAuth stays with our teammate.
+The earlier report exercise is preserved, but isn't part of the new page.

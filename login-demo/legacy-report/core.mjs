@@ -95,24 +95,3 @@ export function actionVerdict(result) {
   }
   return 'INCONCLUSIVE';
 }
-
-// Validate response shape before the page displays a private inbox.
-export function inboxValid(data, owner) {
-  return (
-    typeof owner === 'string' &&
-    data?.owner_id === owner &&
-    Array.isArray(data.messages) &&
-    data.messages.every(
-      (message) =>
-        !!message &&
-        message.recipient_id === owner &&
-        typeof message.id === 'string' &&
-        typeof message.sender_id === 'string' &&
-        typeof message.sender_name === 'string' &&
-        typeof message.sender_email === 'string' &&
-        typeof message.subject === 'string' &&
-        typeof message.body === 'string' &&
-        Number.isFinite(Date.parse(message.created_at)),
-    )
-  );
-}

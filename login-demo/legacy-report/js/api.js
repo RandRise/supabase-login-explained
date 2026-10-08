@@ -1,4 +1,4 @@
-import { TABLE, REPORT_PATH, INBOX_PATH, SEND_PATH, REQUEST_TIMEOUT_MS } from './constants.js';
+import { TABLE, REPORT_PATH, REQUEST_TIMEOUT_MS } from './constants.js';
 // A REST client with an optional logger. It has no DOM or browser-storage dependency.
 
 export function getApiError(result) {
@@ -58,13 +58,5 @@ export function createApi(getConfig, onRequest = () => {}) {
     return request(REPORT_PATH, { method: 'POST', body: {}, token, target });
   }
 
-  function getInbox(token = '', target = getConfig()) {
-    return request(INBOX_PATH, { method: 'POST', body: {}, token, target });
-  }
-
-  function sendMessage(token, body, target = getConfig()) {
-    return request(SEND_PATH, { method: 'POST', body, token, target });
-  }
-
-  return { request, notePath, getReport, getInbox, sendMessage };
+  return { request, notePath, getReport };
 }

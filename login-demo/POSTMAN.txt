@@ -1,0 +1,80 @@
+POSTMAN — SAME API, WITHOUT THE PAGE
+
+Use the desktop Postman app. Import:
+- postman-collection.json
+- postman-environment.template.json
+
+Select "Private Notes — local demo" as the active environment.
+In its LOCAL values, fill:
+- base_url: the project's https://...supabase.co URL (already prefilled)
+- publishable_key: the public browser key from Connection settings
+- demo_password: the invented demo password, provided separately
+
+The remaining values start empty:
+bearer_token, alice_id, bob_id, refresh_token.
+No script automatically saves a token or password. Do not share/export filled
+credentials. The template and collection contain no live secrets.
+
+For the shortest presentation, copy the token from your browser:
+DevTools > Application > Local Storage > http://127.0.0.1:8772
+(or 8773 on the current laptop) > team3-supabase-session-v1.
+Use access_token as the local bearer_token. user.id is that account's UUID.
+After switching accounts, replace bearer_token with the new user's value.
+The password is not sent again for reading or writing messages.
+
+ALTERNATIVE: GET TOKENS IN POSTMAN
+1. Send "1 · Sign in as Alice".
+   Expect 200. Copy access_token into local bearer_token.
+   Copy user.id into alice_id. Keep Alice's token locally for switching back.
+2. Send "2 · Sign in as Bob".
+   Expect 200. Copy user.id into bob_id.
+   Bob's access_token belongs in bearer_token when acting as Bob.
+   The login requests have No Auth; they use email/password, not a bearer token.
+
+MAIN WALKTHROUGH
+3. "Read inbox WITHOUT a token": expect 401, code 42501.
+   The collection explicitly omits Authorization for this request.
+4. Use Alice's access_token as bearer_token.
+   "Alice sends a note to Bob": expect 200, sent:true.
+5. Replace bearer_token with Bob's access_token.
+   "Read current token owner's inbox": Bob sees Alice's note.
+   "Bob replies to Alice": expect 200, sent:true.
+6. Switch to Alice's token. Read inbox: Alice sees Bob's reply.
+7. Send WITHOUT a token: expect 401; no note should be inserted.
+
+ACCESS BOUNDARY
+8. With Bob token, "Try reading Bob's inbox directly": 200 with his existing note.
+   With Alice token, repeat: 200 [].
+   The note exists; RLS hides it from Alice. Empty rows are different from 401.
+   There is no outbox: even the author cannot SELECT the recipient's stored note.
+9. With Alice token, "Try forging Bob's sender identity": expect 403 / 42501.
+   An Alice token cannot make an insert claiming sender_id is Bob.
+   Normal send RPC does not accept a sender_id or inbox owner parameter at all.
+
+STOLEN TOKEN
+Use a copied Alice token in bearer_token while the browser is signed out.
+Read Alice's inbox or send to Bob: this token grants Alice's access without
+her password. It still cannot read Bob's inbox or forge Bob as the sender.
+
+"Sign out this token's session" returns 204. Keep the manually copied token:
+reading the inbox may still work until JWT expiry. Logout revokes the session's
+refresh capability; it does not erase every copy of an already issued JWT.
+That behavior was confirmed against the real provider in VALIDATION.txt.
+
+OPTIONAL REFRESH
+Before logout, copy the genuine refresh_token from login into the local
+refresh_token variable and send the optional refresh request.
+Use the new access/refresh pair returned. An access JWT cannot replace a
+refresh token, and a logged-out session's refresh token is refused.
+The browser demo does not automatically refresh; sign in again after expiry.
+
+TROUBLESHOOTING
+401: missing/invalid/expired bearer token, wrong project key, or anonymous denial.
+403: authenticated request lacks permission (for example, forged sender).
+404/function not found: verify SQL installation; this is not proof of security.
+400: check UUIDs, nonempty subject/body, token type and request parameters.
+Network errors are not authentication results.
+Subject limit: 120 characters; note limit: 4000. Inbox: latest 100 notes.
+
+Current Postman variable docs:
+https://learning.postman.com/docs/use/send-requests/variables/variables/

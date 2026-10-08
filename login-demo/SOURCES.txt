@@ -42,3 +42,26 @@ https://supabase.com/docs/guides/api/securing-your-api
 Local SQL verification uses the PostgreSQL WASM engine PGlite. This confirms
 SQL behavior with fixture identity context, not Supabase's JWT verification.
 https://pglite.dev/docs/
+
+
+MESSAGING REVISION — checked 9 October 2026
+Recipient SELECT and sender INSERT policies:
+https://supabase.com/docs/guides/database/postgres/row-level-security
+
+Invoker functions, restricted execute grants and empty search_path:
+https://supabase.com/docs/guides/database/functions
+
+Supabase password hashing and project password-protection settings:
+https://supabase.com/docs/guides/auth/password-security
+
+Session, refresh and JWT lifetime explanation:
+https://supabase.com/docs/guides/auth/sessions
+
+Postman variables: local values, shared values and credential handling:
+https://learning.postman.com/docs/use/send-requests/variables/variables/
+
+Changelog scan:
+https://supabase.com/changelog
+https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes
+
+Google OAuth is a teammate's part. It is not implemented on the new page.

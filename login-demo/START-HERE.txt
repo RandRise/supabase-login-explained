@@ -1,85 +1,36 @@
-START HERE — PRIVATE REPORTS / SUPABASE LOGIN DEMO
+PRIVATE NOTES — START HERE
 
-Already configured the older demo?
-Keep the same users and notes. Run add-report-action.sql ONCE in that project's
-SQL Editor. Then start this version. Do not rerun the fresh setup.sql.
+OUR EXISTING PROJECT IS READY
+Both invented users and the messaging schema are already configured.
+Do not rerun add-messaging.sql, setup.sql or add-report-action.sql here.
 
-NEW SUPABASE PROJECT
-1. Sign in at https://supabase.com/dashboard and create a separate test project.
-   Check the plan/cost before confirming. No GitHub integration is required.
-   Set the database password yourself; this app never uses it.
+1. Open Terminal in login-demo and run npm start (or node server.mjs).
+   Node.js 20 or newer. No npm install needed.
+2. Open http://127.0.0.1:8772. The current Windows preview is on port 8773.
+3. If needed, Connection settings > Import settings:
+   choose inbox-connection.public.json exported from the original laptop.
+   Older public-settings files still work.
+4. Sign in as alice@test.invalid using the invented demo password provided
+   separately. Send a note to Bob.
+5. Sign out, sign in as bob@test.invalid, read the note, click Reply and send.
+6. Sign out and return to Alice to see the reply.
 
-2. In Authentication > Users, create and confirm these two accounts:
-     alice@test.invalid
-     bob@test.invalid
-   Choose invented demo passwords and keep them privately for rehearsal.
-   Use Create User / Auto Confirm (labels may vary), not an email invitation.
-   .invalid addresses cannot receive email. Do not disable confirmation or RLS
-   on a shared course project. Use a fresh project containing invented data.
+The provided ZIP includes connection.local.json (public URL/key only).
+A Git clone does not include it: import the exported public settings instead.
+An authenticated session is never transferred to a new laptop.
 
-3. Run the entire setup.sql ONCE in the SQL Editor.
-   It checks both users, creates an isolated table, enables owner-only RLS,
-   seeds a note for each user, and adds the protected report function.
-   You do not need to copy UUIDs or create rows by hand.
-   A name collision stops the script. Inspect it; do not delete tables blindly.
+ONLY IF YOU CREATE YOUR OWN SEPARATE TEST PROJECT
+1. Create a Supabase project. GitHub integration is not required.
+2. Authentication > Users > Add user > Create user:
+   alice@test.invalid and bob@test.invalid.
+   Use invented passwords and enable Auto Confirm User for both.
+3. SQL Editor > New query > paste add-messaging.sql > Run ONCE.
+   This creates two invented contacts, a messages table and access rules.
+   Existing tables/auth settings are not changed. If names already exist,
+   stop and check; do not delete or disable RLS.
+4. Connection settings: paste project URL and PUBLISHABLE browser key.
+   Save connection. The anonymous inbox check should receive 401.
+5. Sign in and rehearse. Empty inboxes are normal until a note is sent.
 
-START THE APP
-Install Node.js LTS from https://nodejs.org/ if needed.
-Windows: double-click start-demo.cmd.
-Mac/Linux: open Terminal in login-demo and run:
-  node server.mjs
-Or:
-  npm start
-No npm install is required. Leave the terminal open.
-Open http://127.0.0.1:8772. Do not double-click index.html.
-
-CONNECT ONCE
-Open Connection settings in the app.
-From Supabase's Connect dialog / API Keys settings, copy:
-  Project URL: https://YOUR-PROJECT-REF.supabase.co
-  Publishable key: sb_publishable_...
-A legacy anon key also works. Secret/service_role keys are refused.
-Save connection. The anonymous report check should respond HTTP 401.
-Sign in as Alice and click Download my report. Confirm HTTP 200, Alice's
-owner_id, and her seeded note in the downloaded JSON.
-Both checks are needed: 401 alone could also mean a wrong public key.
-
-MOVE TO A MAC
-Read MAC-SETUP.txt. Export settings on this laptop, import them on the Mac,
-then sign in again. It is the same Supabase project; do not recreate users or
-run SQL again. No passwords or session tokens are exported.
-
-BEFORE SCREEN SHARING
-- Rehearse on the laptop and browser you will actually use.
-- Check internet access, Node startup, and that the Supabase project is ready.
-- Verify Alice's download, anonymous denial, Bob's baseline, and tamper tests.
-- Share the app browser window. Keep Supabase settings/passwords out of view.
-- Raw-token reveal is optional; show claims rather than sharing the full token.
-- Keep Session & access tools collapsed until the demonstration needs them.
-- Use fake accounts only; close token-bearing recordings and sign out afterward.
-
-TROUBLESHOOTING
-Invalid login: check the account, confirmation and password.
-404 / PGRST202: the report function is missing. Run the correct SQL above.
-No seeded report: check setup completed in this same project.
-401 on a valid-token request: read the error; key, expiry and signature differ.
-NETWORK ERROR / 500: an error is inconclusive, not proof access was blocked.
-Port busy: close the old terminal with Ctrl+C, then start again.
-If you need another port:
-  Mac/Linux: PORT=8773 node server.mjs
-  PowerShell: $env:PORT='8773'; node server.mjs
-Then open http://127.0.0.1:8773. Settings are tied to a browser origin, so
-import/re-enter them if you change host, port, browser or laptop.
-
-WHAT THE TOKEN DOES AND DOES NOT ALLOW
-A valid copied Alice JWT can call this protected report action as Alice.
-It does not contain her password, let you produce a valid Bob JWT by editing
-sub, or authorize writing to this read-only table. RLS protects Bob's data.
-This does not prove other tables or endpoints in a larger app are protected.
-
-Expiry is Supabase's real exp claim, commonly around an hour. Editing exp is a
-signature-tampering test, not natural expiry. Refresh is manual in this app.
-Logout revokes refresh access; an existing access JWT may still work until
-expiry. Replay shows the actual server result instead of assuming it.
-
-See VALIDATION.txt for local checks and the live checks still required.
+Postman is optional for using the page, but useful for showing token access.
+Read POSTMAN.txt and PRESENTATION.txt. TASK-COVERAGE.txt checks the assignment.

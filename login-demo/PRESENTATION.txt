@@ -1,39 +1,77 @@
-DEMO SEQUENCE — PRIVATE REPORT / REAL SUPABASE
-Keep this file separate from the shared app window. Nothing is displayed as
-speaking notes inside the app.
+PRIVATE NOTES — ABOUT 5 MINUTES
 
-1. Sign in as Alice, then Download my report.
-   "This looks like a normal account page. The download is an actual action:
-   the browser sends my access token to Supabase, which checks it and returns
-   only my report. The password was checked at login, not on every download."
+0:00 — ALICE
+Sign in as Alice. Send Bob a note:
+Subject: Presentation rehearsal
+Body: Hi Bob, shall we rehearse at 10:00?
 
-2. Open Session & access tools. Request report without a token.
-   "This sends the same request without the Authorization header. Here is the
-   actual HTTP response. The server refused to return a report. Hiding the
-   download button alone would not be enough; this check happens at Supabase."
-   Show HTTP 401 AND the earlier successful download. An invalid key can also
-   cause 401, so confirm the unchanged token works before drawing a conclusion.
+Say: "Supabase checks the password and returns a session. The page attaches
+the access token when it asks the API to send this note. Supabase determines
+the sender from the token, so the form cannot simply choose to be Bob."
 
-3. Show Payload. Find sub, email, exp and iss. Reload.
-   "These claims are readable, but that does not make them trustworthy. The
-   API verifies the token. The browser stores a session so I can reload without
-   entering my password again. The next download still requires authorization."
+0:45 — BOB
+Sign out. Sign in as Bob. Read Alice's note, click Reply and send:
+"Hi Alice, yes. See you at 10:00."
 
-4. Capture token > Sign out > Replay copied token.
-   "A bearer token works through possession. This copy is held separately in
-   memory. Signing out removes the browser session and revokes refresh access,
-   but an access JWT may still work until its expiry. Let's read the response."
-   If accepted: it returned Alice's report. If rejected: show its error; do not
-   claim natural expiry unless the real exp and response support that.
+Say: "Bob's token opens Bob's inbox. A valid Alice token opens Alice's inbox,
+not Bob's. Authentication tells us who you are; RLS restricts the rows you
+are allowed to read."
 
-5. Sign in as Alice again. Verify Bob's note using his password, then run checks.
-   "A copied token can act as Alice in this demo. It cannot become Bob's valid
-   token just by changing the identity or expiry: that breaks the signature.
-   Bob has a confirmed note, but Alice's unchanged token cannot read it."
+1:30 — ALICE'S REPLY
+Sign out, sign in as Alice and read the reply. Reload the page.
 
-Optional Google explanation: open the diagram. Google receives the Google
-password; Supabase exchanges codes and gives the app its own session. This
-version does not perform a live Google sign-in.
+Say: "This page restores its saved session from localStorage. It sends the
+token again and the server still checks access. It does not save the password."
 
-The example is read-only. No write permission is granted to browser users.
-Use invented credentials only. Never send a real token in the group chat.
+2:00 — FIND AND DECODE THE TOKEN
+Chrome DevTools > Application > Local Storage > this site.
+Select team3-supabase-session-v1. Identify access_token, refresh_token and user.
+In DevTools Console, run these lines (no external JWT-decoding website needed):
+
+const demoSession = JSON.parse(localStorage.getItem('team3-supabase-session-v1'));
+const demoCore = await import('/core.mjs');
+const demoClaims = demoCore.decode(demoSession.access_token).payload;
+console.table({ user: demoClaims.sub, email: demoClaims.email, role: demoClaims.role,
+  expires: new Date(demoClaims.exp * 1000).toISOString() });
+
+Say: "These are readable claims, not the password. Decoding does not verify
+the signature. Supabase verifies the token before the request reaches RLS."
+Keep the full credential out of shared notes/recordings.
+
+3:00 — POSTMAN
+Prepare POSTMAN.txt before the meeting.
+Send the no-token inbox request: show 401.
+Add a Bob bearer token: show Bob's inbox.
+Switch to Alice's token: show Alice's inbox.
+Optionally show Alice's direct Bob-inbox query returning [] and the forged
+Bob sender insert returning 403. First show Bob's same query has a real note.
+
+4:00 — TOKEN THEFT
+Use a copied Alice token in Postman while the browser is signed out.
+Read Alice's inbox; optionally send another harmless invented note to Bob.
+
+Say: "Whoever holds this bearer token can use Alice's permissions without
+knowing her password. They cannot use it to read Bob's inbox, forge Bob's
+sender identity, discover Alice's original password, or create a valid Bob
+token by editing the claims. An access token alone cannot refresh a session."
+
+Optional: Postman logout, then repeat read with the copied JWT.
+Say: "Logout clears the browser and revokes this session's refresh capability.
+The access JWT can still work until expiry. Removing it from the page does
+not erase a copy someone already holds."
+
+4:45 — HANDOFF
+"My teammate will explain Google sign-in. This demo covers password login,
+session storage and what the token permits."
+
+PASSWORD EXPLANATION (DOCUMENTED, NOT A HASH-INSPECTION DEMO)
+The browser sends email/password directly to Supabase over HTTPS.
+Supabase stores salted bcrypt hashes and checks the supplied password.
+Hashing is not encryption that can be reversed to recover the password.
+The Node server here only serves files; it never processes login credentials.
+
+DO NOT OVERCLAIM
+This is not end-to-end encrypted messaging. A project administrator can read
+the database. The copied token may also allow other account actions exposed
+by the provider; the limits above concern this demo and the original password.
+We did not test natural expiry by waiting. Google OAuth is not implemented here.

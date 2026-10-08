@@ -1,0 +1,48 @@
+{
+  "name": "Private Notes — local demo",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "https://ravrbucyeciizerkbifz.supabase.co",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "publishable_key",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "bearer_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "alice_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "bob_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "demo_password",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

@@ -1,6 +1,3 @@
-import { inboxValid } from './core.mjs';
-import { createApi } from './js/api.js';
-import { INBOX_PATH, SEND_PATH } from './js/constants.js';
 import { STATIC_FILES } from './server-config.mjs';
 import assert from 'node:assert/strict';
 import { createStaticServer } from './server.mjs';
@@ -98,65 +95,6 @@ check(
   'INCONCLUSIVE',
   'Empty successful response is inconclusive',
 );
-
-const message = {
-  id: 'fixture-note',
-  sender_id: 'bob',
-  recipient_id: 'alice',
-  sender_name: 'Bob',
-  sender_email: 'bob@test.invalid',
-  subject: 'Hello',
-  body: 'Invented data',
-  created_at: '2026-10-09T10:00:00Z',
-};
-check(inboxValid({ owner_id: 'alice', messages: [message] }, 'alice'), true, 'Inbox matches owner');
-check(inboxValid({ owner_id: 'alice', messages: [] }, 'alice'), true, 'Empty inbox legitimate');
-check(
-  inboxValid({ owner_id: 'bob', messages: [message] }, 'alice'),
-  false,
-  'Wrong inbox owner refused',
-);
-check(
-  inboxValid({ owner_id: 'alice', messages: [{ ...message, recipient_id: 'bob' }] }, 'alice'),
-  false,
-  'Foreign recipient refused',
-);
-check(
-  inboxValid({ owner_id: 'alice', messages: [{ ...message, created_at: 'invalid' }] }, 'alice'),
-  false,
-  'Malformed timestamp refused',
-);
-check(inboxValid({ owner_id: 'alice', messages: [null] }, 'alice'), false, 'Null message refused');
-check(inboxValid(null, undefined), false, 'Missing owner refused');
-const realFetch = globalThis.fetch;
-const calls = [];
-try {
-  globalThis.fetch = async (url, options) => {
-    calls.push({ url, ...options });
-    return { ok: true, status: 200, text: async () => JSON.stringify({ fixture: true }) };
-  };
-  const api = createApi(() => ({ url: 'https://test.supabase.co', key: 'sb_publishable_fixture' }));
-  await api.getInbox();
-  check(calls[0].headers.Authorization, undefined, 'Anonymous request really omits bearer');
-  check(calls[0].url, 'https://test.supabase.co' + INBOX_PATH, 'Real inbox route');
-  await api.getInbox('invented-fixture-token');
-  check(
-    calls[1].headers.Authorization,
-    'Bearer invented-fixture-token',
-    'Token is request credential',
-  );
-  await api.sendMessage('invented-fixture-token', {
-    p_recipient_id: 'bob',
-    p_subject: 'Hello',
-    p_body: 'Hi',
-  });
-  check(calls[2].url, 'https://test.supabase.co' + SEND_PATH, 'Real send route');
-  check('sender_id' in JSON.parse(calls[2].body), false, 'Send RPC has no client-selected sender');
-  check(calls[2].credentials, 'omit', 'Cookie auth not simulated');
-} finally {
-  globalThis.fetch = realFetch;
-}
-
 const server = createStaticServer();
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 try {
@@ -184,6 +122,5 @@ try {
   await new Promise((r) => server.close(r));
 }
 console.log(
-  checks +
-    ' checks passed: decoder, config safety, inbox ownership, request credentials and static server.',
+  checks + ' checks passed: decoder, config safety, evidence classification and static server.',
 );

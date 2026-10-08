@@ -1,0 +1,55 @@
+ASSIGNMENT COVERAGE — PRIVATE NOTES
+
+What happens to the password?
+- Observe: HTTPS login to Supabase in Network; password field clears afterwards.
+- Explain from provider docs: salted bcrypt hash storage and password checking.
+- We do not inspect or display password hashes. Node serves static files only.
+
+What is a session or token, and where is it stored?
+- Observe: localStorage key team3-supabase-session-v1 holds access_token,
+  refresh_token and minimal user info, scoped to the project URL.
+- Explain: access JWT authenticates API requests; refresh token can renew a
+  valid session. Session is more than the token's readable claims.
+- Nothing is stored in a password file or exported with public connection settings.
+
+How does the site remember login across pages?
+- Observe: reload restores the session; inbox loads through a new API request.
+- This app is one page, so reload demonstrates persistence rather than claiming
+  a multi-page navigation demo. Another page on the same origin could read
+  the same stored session. Other apps can instead use cookies.
+- No automatic refresh in this intentionally small demo. Re-login after expiry.
+
+Find and decode a real Supabase token?
+- Observe: DevTools Storage and the local decoder in PRESENTATION.txt.
+- Decode sub/email/role/exp; do not claim decoding verifies a signature.
+- Raw-token and copied-token panels were removed from the product page.
+
+What can an attacker do with a stolen token?
+- Observe in Postman: a copied Alice bearer token reads Alice's inbox and sends
+  as Alice without a password. Same for Bob's token and Bob's permissions.
+- Live checks confirmed copied-token read after logout; JWT remains usable
+  until expiry in this project's Data API behavior.
+- Use only invented accounts/data and keep credentials out of shared files.
+
+What can't that Alice token do?
+- Observe: read Bob's known-existing inbox rows (RLS gives []);
+  forge Bob's sender_id (403); use an edited sub/exp (401);
+  use an access JWT as a refresh token (400).
+- Explain: readable claims contain no original password; no valid signature
+  for arbitrary replacement claims. Do not claim token theft is harmless or
+  that a token cannot perform any other provider account operation.
+
+Google sign-in without revealing Google's password?
+- Assigned to teammate. Removed from our page, as requested.
+- The group must still cover the OAuth explanation in the final presentation.
+- No live Google integration or Google sign-in test is claimed here.
+
+Dummy page feasible with time/resources?
+- Yes: a static browser page, real separate Supabase test project and two
+  invented accounts. No application server, paid AI API, build step or package
+  install is needed. Postman is optional for use, recommended for presentation.
+- Rehearse on the presentation laptop with internet; allow about five minutes
+  for the walkthrough. This setup is already installed in our test project.
+
+Validation evidence is in VALIDATION.txt, with live tests separated from
+local SQL, pure checks and fixture DOM checks.

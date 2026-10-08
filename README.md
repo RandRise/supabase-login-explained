@@ -1,10 +1,10 @@
-# Supabase Login Explained
+# Private Notes: login explained
 
-A small login app for the Mayerfeld Practicum. Sign in, download your own private report, and show what changes when the same request has no token.
+A small Alice/Bob messaging app with real Supabase Auth and Postgres row level security. Alice sends Bob a note; Bob signs in to read it and reply. Only the recipient can read a stored message.
 
-## Run on a Mac
+## Run
 
-Install [Node.js LTS](https://nodejs.org/) first. In Terminal:
+Install Node.js 20 or newer, then:
 
 ```sh
 git clone https://github.com/RandRise/supabase-login-explained.git
@@ -12,75 +12,54 @@ cd supabase-login-explained/login-demo
 npm start
 ```
 
-Open **http://127.0.0.1:8772** and leave Terminal running. There is no `npm install` step. If macOS asks to install its command-line tools for `git`, accept and rerun the clone command. You can also download the repository ZIP using GitHub's **Code → Download ZIP**, extract it, open Terminal in `login-demo`, and run `node server.mjs`.
+Open http://127.0.0.1:8772. No npm install is required. The Windows preview currently uses port 8773.
 
-Windows: double-click `login-demo/start-demo.cmd`, or run the same Node command.
+On a fresh clone, import the original laptop's **public connection settings** using Connection settings → Import settings. The shareable ZIP includes those public settings and connects automatically. Each laptop signs in separately.
 
-## Use the same Supabase project on both laptops
-
-On the first laptop, open **Connection settings → Export settings**. Move `reports-connection.public.json` to the Mac. Start the app there, open **Connection settings → Import settings**, and select that file. Then sign in again.
-
-The export contains the project URL and public browser key only. It does not transfer your login, passwords or tokens. You do not need a second Supabase project, database setup, GitHub login, OAuth redirect change or deployment. Both laptops need an internet connection.
-
-If you have not configured Supabase yet, follow [START-HERE.txt](login-demo/START-HERE.txt).
-
-- Fresh project: create two confirmed test accounts and run [setup.sql](login-demo/setup.sql) once.
-- Previously configured demo: run [add-report-action.sql](login-demo/add-report-action.sql) once to add the new report action. Leave the existing users, notes and policies in place.
+See [Mac setup](login-demo/MAC-SETUP.txt), [first setup](login-demo/START-HERE.txt), [presentation flow](login-demo/PRESENTATION.txt), and [Postman walkthrough](login-demo/POSTMAN.txt).
 
 ## What to show
 
-1. Sign in as Alice and click **Download my report**. Supabase returns her report; the browser saves a JSON file.
-2. Open **Session & access tools** and click **Request report without a token**. It sends the same POST to Supabase, omitting the Authorization header. The function raises an authentication error; PostgREST maps it to HTTP 401 for anonymous access.
-3. Inspect the real JWT payload and browser storage. Reload to show session persistence.
-4. Capture the token, sign out, then replay it. Show the actual result: a copied access JWT may still work until expiry.
-5. Verify Bob's note, then run the tampering and owner-access checks to show the copied token cannot become Bob's identity by editing it.
+1. Alice signs in and sends a note to Bob.
+2. Sign out. Bob signs in, reads it and uses Reply.
+3. Sign out. Alice signs in and receives Bob's reply.
+4. In Postman: no token → 401; Bob token → Bob inbox; Alice token → Alice inbox.
+5. Read Bob's known existing messages directly with Alice's token → 200 and an empty array. Try forging Bob's sender identity → 403.
+6. In browser DevTools, find the saved session and decode only the JWT claims. Reload the page to demonstrate session restoration.
+7. Explain that a copied bearer token can read/send as its owner without the password. Google sign-in is covered by a teammate.
 
-The normal interface has no speaking notes or step-by-step presentation overlay. Inspection tools stay collapsed until you open them.
+[Task coverage](login-demo/TASK-COVERAGE.txt) separates what we observe from what we explain. [Validation](login-demo/VALIDATION.txt) records actual live-provider checks separately from fixture tests.
 
-## How the protected action works
+## Layout
 
-`POST /rest/v1/rpc/team3_download_private_report` calls a Postgres function with no user-ID argument. Supabase validates the access JWT; `auth.uid()` identifies the caller. The function requires that identity and runs as `SECURITY INVOKER`, so table permissions and row-level security still apply. No secret key or local authentication backend is involved. The local Node server serves static files only.
+- `app.js`: startup and event wiring.
+- `js/constants.js`: storage keys, API paths and limits.
+- `js/api.js`: HTTP client shared by the page and live checks.
+- `js/auth.js`: login/logout and local session storage.
+- `js/messaging.js`: fetch inbox, load contacts and send notes.
+- `js/ui.js`: safe text rendering and page controls.
+- `js/settings.js`: public connection import/export.
+- `js/state.js`: browser state and project-scoped restoration.
+- `core.mjs`: pure JWT/config helpers and earlier report verification helpers.
+- `server.mjs` / `server-config.mjs`: explicit static files only.
+- `add-messaging.sql`: additive contacts/messages schema, grants, RLS and invoker RPCs.
+- `postman-collection.json` / `postman-environment.template.json`: requests with empty credential variables.
 
-The anonymous action explicitly fails. By comparison, a direct anonymous SELECT on the notes table returns zero rows under RLS; that is a different behavior and is not labelled as HTTP denial.
+The earlier report SQL and source files remain for reference; the new page does not import their controls. The complete earlier report demo is preserved in `login-demo/legacy-report/`. Other course exercises remain untouched.
 
-## Rehearse and verify
+## Scope
+
+This is a test app, not an end-to-end encrypted messenger. Supabase stores the messages; project administrators can access them. A verified token determines whose inbox is queried. There is no caller-selected inbox owner and no outbox. The inbox returns the latest 100 notes.
+
+The page stores its token pair in localStorage and clears the password field after login. This makes storage easy to demonstrate; it is not a recommendation for every production app. It restores sessions on reload and requires signing in again when the access token expires. Postman includes an optional genuine refresh request.
+
+Only public URL/key settings are shareable. Passwords, JWTs, refresh tokens and browser-storage dumps never belong in the repository or ZIP.
+
+## Checks
 
 ```sh
 cd login-demo
 npm test
 ```
 
-See [MAC-SETUP.txt](login-demo/MAC-SETUP.txt), [PRESENTATION.txt](login-demo/PRESENTATION.txt), [SOURCES.txt](login-demo/SOURCES.txt), and [VALIDATION.txt](login-demo/VALIDATION.txt).
-
-Use invented data only. Tokens are visible in localStorage for this lesson, so this is a classroom demo rather than a production session template. Never commit live tokens, secret keys, passwords, or storage dumps. Google sign-in is an explanatory diagram, not a live integration.
-
-Local public configuration can also be loaded from an ignored
-`login-demo/connection.local.json` file. It uses the exported settings format
-and never includes a password or session. The current presenter's test project
-has its schema, confirmed demo users, and sample reports installed.
-Do not rerun the fresh SQL setup against an already configured project.
-
-## Code layout
-
-`app.js` is the entry point. It imports named functions, connects them to the
-page controls, and initializes the page. Business logic lives in these files:
-
-| File | Responsibility |
-| --- | --- |
-| `login-demo/js/constants.js` | Storage keys, API paths, filenames, limits and timers |
-| `login-demo/js/state.js` | Browser state, storage helpers and session validation |
-| `login-demo/js/api.js` | Supabase REST requests and response errors |
-| `login-demo/js/auth.js` | Sign in, sign out, refresh and applying a session |
-| `login-demo/js/reports.js` | Downloading a report and requesting it without a token |
-| `login-demo/js/token-lab.js` | Captured-token replay, Bob's baseline and evidence checks |
-| `login-demo/js/settings.js` | Connection settings, import/export and changes from another tab |
-| `login-demo/js/ui.js` | DOM rendering, notices, button bindings and request activity |
-| `login-demo/core.mjs` | Pure JWT, public-config and evidence helpers |
-| `login-demo/server-config.mjs` | Server port, allowed file paths, MIME types and headers |
-| `login-demo/server.mjs` | Static-file server startup and request handling |
-
-The browser loads standard JavaScript modules directly. There is no build step
-or production dependency installation. `.editorconfig` and `.prettierrc.json`
-set the formatting style: two-space indentation and readable line lengths.
-Functions are separated by blank lines; HTML and CSS are formatted as well.
-Saved sessions and previously exported public settings remain compatible.
+Node checks exercise the static server, JWT decoder and configuration safety. They do not prove live-provider authorization. Live Supabase, local PostgreSQL and fixture DOM results are reported separately in VALIDATION.txt.

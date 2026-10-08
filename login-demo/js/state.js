@@ -1,26 +1,5 @@
-import { SESSION_KEY, CONFIG_KEY, BASE_KEY } from './constants.js';
+import { SESSION_KEY, CONFIG_KEY } from './constants.js';
 import { decode, validateConfig } from '../core.mjs';
-
-export function saveStorage(key, value) {
-  try {
-    value == null ? localStorage.removeItem(key) : localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    throw Error('Browser storage is blocked. Allow local site storage to use this demo.');
-  }
-}
-
-export function isStoredSessionValid(s) {
-  try {
-    return (
-      !!state.config &&
-      s?.scope === state.config.url &&
-      typeof s.refresh_token === 'string' &&
-      s.user?.id === decode(s.access_token).payload.sub
-    );
-  } catch {
-    return false;
-  }
-}
 
 export function readStorage(key, fallback = null) {
   try {
@@ -30,14 +9,40 @@ export function readStorage(key, fallback = null) {
   }
 }
 
+export function saveStorage(key, value) {
+  try {
+    if (value == null) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch {
+    throw Error('Browser storage is blocked. Allow local site storage to use this demo.');
+  }
+}
+
 export const state = {
   config: readStorage(CONFIG_KEY),
   session: readStorage(SESSION_KEY),
-  captured: null,
-  part: 'payload',
+  contacts: [],
+  messages: [],
   busy: false,
-  trailCount: 0,
+  inboxLoaded: false,
 };
+
+export function isStoredSessionValid(session) {
+  try {
+    return (
+      !!state.config &&
+      session?.scope === state.config.url &&
+      typeof session.refresh_token === 'string' &&
+      !!session.refresh_token &&
+      session.user?.id === decode(session.access_token).payload.sub
+    );
+  } catch {
+    return false;
+  }
+}
 
 try {
   if (state.config) {
@@ -46,6 +51,7 @@ try {
 } catch {
   state.config = null;
 }
+
 if (!isStoredSessionValid(state.session)) {
   state.session = null;
 }
@@ -55,9 +61,4 @@ export function getToken() {
     throw Error('Sign in first.');
   }
   return state.session.access_token;
-}
-
-export function getBaseline() {
-  const baseline = readStorage(BASE_KEY);
-  return baseline?.scope === state.config?.url ? baseline : null;
 }
