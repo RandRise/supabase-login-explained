@@ -1,0 +1,55 @@
+LOGIN EXPLAINED — PRESENTATION GUIDE
+
+FILE
+Login-Explained-Presentation.pptx
+15 editable slides with speaker notes and source links.
+Open in PowerPoint, or upload the PPTX to Google Slides.
+Slides 1–13 are the main presentation. Slides 14–15 are the coverage checklist
+and references. Allow roughly 12–15 minutes including the live demo.
+Adjust the speaking split to your group's actual time limit.
+
+SUGGESTED HANDOFF
+Slides 2–5: how login, sessions and browser storage work.
+Slides 6–10: JWT claims, permissions, stolen-token replay and logout.
+Slide 11: the teammate explaining Google sign-in.
+Slide 12: Rand switches to the real student portal and Swagger.
+Slide 13: one audience question and the takeaway.
+The notes explain what to say. Detailed clicks remain in login-demo/PRESENTATION.txt.
+
+REQUIREMENTS RECHECK
+Password handling: slide 3 explains HTTPS and salted bcrypt hashing.
+Session/token purpose: slide 4 distinguishes session, access and refresh tokens.
+Storage/remembered login: slide 5 and the live DevTools/reload demonstration.
+Find and decode a token: slide 6 and Swagger's local claims display.
+Google sign-in: slide 11 gives the conceptual flow, for the teammate to present.
+Stolen-token abilities/limits: slides 8–10 and the real replay demonstration.
+Working artifact/feasibility: the student portal and Swagger use the existing
+Supabase test project and can run locally on either laptop.
+
+The assignment is covered by the demo plus these explanations.
+Google sign-in and server password hashing are explained, not live features
+or inspections in our app. We do not demonstrate automatic token refresh.
+No extra tables, account settings or login features are needed.
+
+BEFORE THE PRESENTATION
+1. Start the app and confirm internet access to Supabase.
+2. Confirm Alice and Bob are enrolled and each has a quiz attempt.
+3. Keep the portal and Swagger on the same host/port.
+4. Have the invented passwords available privately.
+5. Rehearse finding the stored session and explaining sub/email/role/expiry.
+6. Keep the full tokens and password fields out of shared slides or recordings.
+
+THE IMPORTANT SWAGGER DISTINCTION
+The portal and Swagger can hold different tokens.
+Use portal session copies whichever account is currently stored by the portal.
+Swagger's existing bearer survives a portal account switch until replaced.
+The response student_id identifies the owner of the recorded attempt.
+Submitting in Swagger does not refresh the portal's displayed score.
+To inspect the new score, sign into the relevant account and click View my result.
+
+OPTIONAL REHEARSAL QUESTION
+"Bob is signed in on the portal, but Swagger sends Alice's token.
+Whose result changes?"
+Answer: Alice's, because the server authorizes the token on that request.
+
+Sources appear in the slide notes. No live credentials appear in this deck.

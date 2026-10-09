@@ -23,6 +23,10 @@ The prepared shareable ZIP includes public connection settings. For a GitHub clo
 - [Task coverage](login-demo/TASK-COVERAGE.txt)
 - [Actual validation results](login-demo/VALIDATION.txt)
 
+## Presentation
+
+[PowerPoint slides](presentation/Login-Explained-Presentation.pptx) include speaker notes, a Google sign-in explanation, the live-demo sequence and a requirements checklist. See the [presentation guide](presentation/READ-ME.txt) for the group handoff.
+
 ## What to show
 
 1. As a guest, read the public questions. Click View my result: the real API returns 401.
