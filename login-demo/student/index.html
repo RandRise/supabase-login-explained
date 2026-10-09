@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Student Portal · Login Essentials</title>
+    <link rel="stylesheet" href="/student/style.css" />
+    <script type="module" src="/student/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-icon">S</span> Student Portal</a>
+      <nav aria-label="Main">
+        <a href="/swagger" target="_blank" rel="noopener">API docs ↗</a
+        ><button id="settings-open" class="quiet">Connection</button
+        ><button id="sign-in">Sign in</button><button id="sign-out" hidden>Sign out</button>
+      </nav>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">AI OPERATIONS · PRACTICE QUIZ</p>
+          <h1>A little quiz.<br />A real login.</h1>
+          <p class="subtitle">
+            Test your knowledge of sessions and tokens.<br />Your answers are graded on the server.
+            Your results belong to you.
+          </p>
+        </div>
+        <div class="identity-card">
+          <span class="live-dot"></span><strong id="identity">Guest</strong
+          ><span id="session-status">No student session</span>
+        </div>
+      </div>
+      <p id="notice" role="status" aria-live="polite">Loading your course…</p>
+      <div class="workspace">
+        <section class="card quiz-card" aria-labelledby="quiz-title">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">01 / THE QUIZ</p>
+              <h2 id="quiz-title">Login essentials</h2>
+            </div>
+            <span class="pill">3 questions</span>
+          </div>
+          <form id="quiz-form">
+            <div id="questions"><p>Connect the test project to load the questions.</p></div>
+            <div class="form-footer">
+              <span>Choose one answer per question.</span
+              ><button class="primary" type="submit">Submit answers →</button>
+            </div>
+          </form>
+        </section>
+        <aside>
+          <section class="card result-card">
+            <p class="eyebrow">02 / YOUR RESULTS</p>
+            <h2 id="result-name">Private result</h2>
+            <div class="score-ring" id="score-ring"><span id="score">—</span></div>
+            <p id="result-detail">Sign in to access your result.</p>
+            <button id="read-result" class="wide">View my result</button>
+            <p class="small">Only your authenticated account can access this record.</p>
+          </section>
+          <section class="api-card">
+            <span class="eyebrow">LOOK UNDER THE HOOD</span>
+            <h3>Same request. Different token.</h3>
+            <p>
+              Use Swagger to call the real API, remove the bearer token, and inspect the response.
+            </p>
+            <a href="/swagger" target="_blank" rel="noopener">Open API explorer ↗</a>
+          </section>
+        </aside>
+      </div>
+      <details id="request-details" class="card request-details">
+        <summary>Last data request <span id="request-status" class="pill">Ready</span></summary>
+        <div class="request-flow">
+          <span>Browser</span><span>→</span><span>Supabase</span><span>→</span><span>Response</span>
+        </div>
+        <code id="request-path">No request yet</code>
+        <p id="request-token" class="small"></p>
+        <pre id="request-body"></pre>
+      </details>
+      <footer>
+        Learning demo · Invented student accounts · Powered by real Supabase Auth &amp; database
+        policies
+      </footer>
+    </main>
+    <dialog id="login-dialog">
+      <form id="login-form">
+        <p id="login-error" role="alert"></p>
+        <div class="dialog-heading">
+          <h2>Welcome back</h2>
+          <button type="button" class="quiet" data-close aria-label="Close sign in">×</button>
+        </div>
+        <p>Sign in to submit your quiz and see your results.</p>
+        <label
+          >Email<input
+            id="email"
+            type="email"
+            autocomplete="username"
+            required
+            placeholder="alice@test.invalid" /></label
+        ><label
+          >Password<input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required /></label
+        ><button class="primary wide" type="submit">Sign in</button>
+      </form>
+    </dialog>
+    <dialog id="settings-dialog">
+      <form id="settings-form">
+        <p id="settings-error" role="alert"></p>
+        <div class="dialog-heading">
+          <h2>Connect the test project</h2>
+          <button type="button" class="quiet" data-close aria-label="Close connection">×</button>
+        </div>
+        <p>Use your project URL and publishable key. Never enter a secret or service-role key.</p>
+        <label
+          >Supabase URL<input
+            id="project-url"
+            type="url"
+            required
+            placeholder="https://your-project.supabase.co" /></label
+        ><label
+          >Publishable key<input
+            id="project-key"
+            required
+            autocomplete="off"
+            spellcheck="false" /></label
+        ><button class="primary wide" type="submit">Save connection</button>
+        <div class="settings-transfer">
+          <button type="button" id="settings-import">Import settings</button
+          ><button type="button" id="settings-export">Export settings</button>
+        </div>
+        <input id="settings-file" type="file" accept=".json,application/json" hidden />
+      </form>
+    </dialog>
+  </body>
+</html>

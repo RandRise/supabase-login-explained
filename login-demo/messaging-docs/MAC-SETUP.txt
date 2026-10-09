@@ -1,0 +1,40 @@
+ON YOUR MAC
+
+1. Install Node.js 20 or newer from https://nodejs.org/.
+2. Open Terminal:
+
+   git clone https://github.com/RandRise/supabase-login-explained.git
+   cd supabase-login-explained/login-demo
+   npm start
+
+3. Open http://127.0.0.1:8772 and leave Terminal open.
+   Ctrl+C stops the server. No npm install required.
+
+If git asks for Apple's command-line tools, install them and retry.
+Or download GitHub > Code > Download ZIP, extract it and run npm start from
+login-demo. The ZIP prepared in this chat includes public connection settings;
+GitHub's automatically generated ZIP does not.
+
+ON THE ORIGINAL LAPTOP
+Connection settings > Export settings.
+Move inbox-connection.public.json to the Mac.
+
+ON THE MAC
+Connection settings > Import settings > choose the public JSON file.
+Sign in separately using the same invented Alice/Bob credentials.
+Use the existing Supabase project; no new users or SQL required.
+Alice sends to Bob, sign out, Bob reads and replies, sign out, Alice reads.
+
+API PLAYGROUND ON THE MAC
+Open API playground in the page. No separate app or token setup required.
+Sign in > Use signed-in token, then compare requests with/without it.
+Follow API-PLAYGROUND.txt. Tokens stay masked and in this page only.
+
+UPDATES
+Stop the server, run git pull from the repository, then start it again.
+Inspect your own edits first; do not reset or discard them blindly.
+
+REHEARSAL
+Internet and an active Supabase project are required.
+Check login, delivery, reply, reload and no-token access on the actual Mac.
+The code uses portable Node commands, but we have not run it on macOS.

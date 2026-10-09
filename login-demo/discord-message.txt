@@ -1,20 +1,15 @@
-The demo now has a small API playground built into the page. No Postman app needed.
+I changed the demo to a student portal so the login/token idea is easier to follow.
 
-Alice and Bob can still sign in, exchange notes and reply normally.
-In API playground, choose Read my inbox or Send a note, then send the request
-with or without a bearer token. The page shows the real Supabase status and
-response, with the token masked.
+Alice and Bob take a short quiz and each sees their own result. Supabase handles the login, calculates the score, and checks who can read it.
 
-Quick demonstration: no token -> 401. Sign in as Bob, Use signed-in token,
-repeat -> 200 and Bob's inbox. Switch to Alice's token -> Alice's inbox.
-There are optional checks for reading another inbox and claiming another sender.
+There's also a Swagger page where we can run the same request with and without a token:
+- no token: 401
+- Alice's token: Alice's result
+- Alice asking for Bob's result: 403
+- a copied, unexpired Alice token can still act as Alice after logout
 
-Repo: https://github.com/RandRise/supabase-login-explained
-Run npm start from login-demo, open http://127.0.0.1:8772.
-The current Windows preview uses http://127.0.0.1:8773.
-Use the provided ZIP or import the original laptop's public connection settings
-on a Git clone. Sign in separately; passwords are provided separately.
+I'll present the demo. Google sign-in can stay with the person covering that section.
 
-API-PLAYGROUND.txt has the browser-only steps. PRESENTATION.txt covers the
-walkthrough and TASK-COVERAGE.txt checks the assignment. Google stays with
-our teammate. No passwords or tokens are in the ZIP or repository.
+The ZIP includes the public connection settings. Install Node.js 20+, extract it, open a terminal in login-demo, and run npm start. Open http://127.0.0.1:8772. No npm install needed. I'll share the invented login details separately.
+
+PRESENTATION.txt has the order of the demo, SWAGGER.txt explains the API controls, and MAC-SETUP.txt covers moving it to another laptop.

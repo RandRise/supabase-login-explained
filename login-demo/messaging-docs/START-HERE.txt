@@ -1,0 +1,36 @@
+PRIVATE NOTES — START HERE
+
+OUR EXISTING PROJECT IS READY
+Both invented users and the messaging schema are already configured.
+Do not rerun add-messaging.sql, setup.sql or add-report-action.sql here.
+
+1. Open Terminal in login-demo and run npm start (or node server.mjs).
+   Node.js 20 or newer. No npm install needed.
+2. Open http://127.0.0.1:8772. The current Windows preview is on port 8773.
+3. If needed, Connection settings > Import settings:
+   choose inbox-connection.public.json exported from the original laptop.
+   Older public-settings files still work.
+4. Sign in as alice@test.invalid using the invented demo password provided
+   separately. Send a note to Bob.
+5. Sign out, sign in as bob@test.invalid, read the note, click Reply and send.
+6. Sign out and return to Alice to see the reply.
+
+The provided ZIP includes connection.local.json (public URL/key only).
+A Git clone does not include it: import the exported public settings instead.
+An authenticated session is never transferred to a new laptop.
+
+ONLY IF YOU CREATE YOUR OWN SEPARATE TEST PROJECT
+1. Create a Supabase project. GitHub integration is not required.
+2. Authentication > Users > Add user > Create user:
+   alice@test.invalid and bob@test.invalid.
+   Use invented passwords and enable Auto Confirm User for both.
+3. SQL Editor > New query > paste add-messaging.sql > Run ONCE.
+   This creates two invented contacts, a messages table and access rules.
+   Existing tables/auth settings are not changed. If names already exist,
+   stop and check; do not delete or disable RLS.
+4. Connection settings: paste project URL and PUBLISHABLE browser key.
+   Save connection. The anonymous inbox check should receive 401.
+5. Sign in and rehearse. Empty inboxes are normal until a note is sent.
+
+API playground is built into the page to show requests with/without a token.
+No separate Postman app required. Read API-PLAYGROUND.txt and PRESENTATION.txt. TASK-COVERAGE.txt checks the assignment.

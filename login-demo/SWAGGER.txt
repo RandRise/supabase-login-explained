@@ -1,0 +1,50 @@
+SWAGGER API EXPLORER
+
+Open /swagger on the same local host and port as the student portal.
+This is actual Swagger UI 5.33.1, packaged locally, using an OpenAPI 3 definition.
+Requests go directly to Supabase. The local Node server handles no login logic.
+
+CONTROLS
+Use portal session: reads the current portal session once and attaches its
+access token using Swagger's standard bearer authorization.
+Remove bearer token: removes the user JWT but retains the public project key.
+Clear responses: remounts Swagger and clears request/response panels.
+Decoded token claims: shows only selected claims, never the full JWT.
+Authorize: Swagger's standard dialog for manually entering an access token.
+Enter the JWT only; Swagger supplies the Bearer prefix.
+
+Swagger keeps the bearer in this tab's memory. It does not automatically switch
+to Bob when you change the portal account. Click Use portal session again.
+This independent copy is intentional for the stolen-token demonstration.
+Reloading Swagger drops it. persistAuthorization is false.
+The portal separately stores its session in localStorage for the storage lesson.
+
+REQUESTS
+POST team3_get_quiz: public questions; project key alone is enough.
+POST team3_submit_quiz: {"p_answers":[1,2,0]} submits an attempt with server grading.
+POST team3_get_result: {"p_student_id":null} reads the token owner's latest result.
+GET team3_quiz_students: the two invented names/UUIDs for the ownership test.
+GET team3_quiz_attempts: direct table query, still restricted by RLS.
+
+The two authorization schemes are combined with AND for protected endpoints.
+The project key identifies the application. It does not sign in a student.
+
+EXPECTED OBSERVATIONS
+No bearer -> protected RPC HTTP 401.
+Valid own bearer -> HTTP 200, own result or latest:null if no submission yet.
+Valid Alice bearer + Bob UUID -> result RPC HTTP 403.
+Alice bearer + direct table filter for Bob -> HTTP 200, [] (RLS filtering).
+Edited JWT with old signature -> HTTP 401.
+Invalid answer list -> HTTP 400.
+A score cannot be supplied to the quiz RPC. A direct insert that attempts
+to write the generated score column is rejected (observed 400, SQLSTATE 428C9).
+
+The public student roster is not accessible to unauthenticated requests.
+Its two invented student IDs are intentionally visible to signed-in users.
+
+SCREEN SHARING
+Generated curl commands and download controls are hidden to keep JWTs out of
+the projected request preview. This is a display choice, not a security barrier:
+Authorize and browser DevTools can still reveal credentials. Never distribute
+screenshots or exports of a live bearer/refresh token.
+No external validator is enabled and Swagger assets are served locally.

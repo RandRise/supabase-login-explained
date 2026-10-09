@@ -1,40 +1,43 @@
-ON YOUR MAC
+MOVE THE STUDENT DEMO TO YOUR MAC
 
-1. Install Node.js 20 or newer from https://nodejs.org/.
-2. Open Terminal:
+EASIEST: PREPARED ZIP
+1. Transfer supabase-login-demo.zip to the Mac and extract it.
+2. Install Node.js 20 or newer from https://nodejs.org/.
+3. Open Terminal, type cd followed by a space, drag the extracted login-demo
+   folder into Terminal, and press Return.
+4. Run: npm start
+5. Open http://127.0.0.1:8772. Swagger: http://127.0.0.1:8772/swagger.
+   Leave Terminal open. Ctrl+C stops the server. No npm install needed.
+6. Sign in separately with the invented student accounts.
 
-   git clone https://github.com/RandRise/supabase-login-explained.git
-   cd supabase-login-explained/login-demo
-   npm start
+The prepared ZIP already includes public connection settings.
+The database lives at Supabase, so existing quiz results are available on either
+laptop. You do not need to create users or rerun SQL when moving computers.
 
-3. Open http://127.0.0.1:8772 and leave Terminal open.
-   Ctrl+C stops the server. No npm install required.
+OR CLONE FROM GITHUB
+git clone https://github.com/RandRise/supabase-login-explained.git
+cd supabase-login-explained/login-demo
+npm start
 
-If git asks for Apple's command-line tools, install them and retry.
-Or download GitHub > Code > Download ZIP, extract it and run npm start from
-login-demo. The ZIP prepared in this chat includes public connection settings;
-GitHub's automatically generated ZIP does not.
+If Git asks for Apple's command-line tools, install them and retry.
+GitHub's automatic Download ZIP does not include connection settings.
 
-ON THE ORIGINAL LAPTOP
-Connection settings > Export settings.
-Move inbox-connection.public.json to the Mac.
+On the original laptop: Connection > Export settings.
+Transfer student-connection.public.json to the Mac.
+On the Mac: Connection > Import settings.
+This file has the public project URL/key only. Do not transfer browser sessions.
 
-ON THE MAC
-Connection settings > Import settings > choose the public JSON file.
-Sign in separately using the same invented Alice/Bob credentials.
-Use the existing Supabase project; no new users or SQL required.
-Alice sends to Bob, sign out, Bob reads and replies, sign out, Alice reads.
-
-API PLAYGROUND ON THE MAC
-Open API playground in the page. No separate app or token setup required.
-Sign in > Use signed-in token, then compare requests with/without it.
-Follow API-PLAYGROUND.txt. Tokens stay masked and in this page only.
+SWAGGER
+Open API docs from the portal. Sign in on the portal, then click Use portal
+session in Swagger. Both tabs must use the exact same host and port.
+127.0.0.1 and localhost are different browser storage origins.
+No Postman, Swagger account or separate installation is needed.
 
 UPDATES
-Stop the server, run git pull from the repository, then start it again.
-Inspect your own edits first; do not reset or discard them blindly.
+Stop the server, run git pull from the repository, then npm start again.
+Preserve your own edits; do not blindly reset them.
 
-REHEARSAL
+REHEARSE ON THE ACTUAL MAC
+Test login, quiz submission, reload, Swagger and missing-token denial.
 Internet and an active Supabase project are required.
-Check login, delivery, reply, reload and no-token access on the actual Mac.
-The code uses portable Node commands, but we have not run it on macOS.
+The commands are portable, but this version has not been run on macOS.

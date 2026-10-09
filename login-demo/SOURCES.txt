@@ -65,3 +65,10 @@ https://supabase.com/changelog
 https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes
 
 Google OAuth is a teammate's part. It is not implemented on the new page.
+
+STUDENT QUIZ / SWAGGER — checked 9 October 2026
+https://www.postgresql.org/docs/17/ddl-generated-columns.html
+https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
+https://swagger.io/docs/specification/v3_0/authentication/bearer-authentication/
+https://swagger.io/docs/specification/v3_0/authentication/api-keys/
+https://supabase.com/docs/guides/auth/signout

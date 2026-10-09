@@ -40,6 +40,14 @@ export function createStaticServer() {
       response.writeHead(200, {
         'Content-Type': CONTENT_TYPES[extension] + '; charset=utf-8',
         ...SECURITY_HEADERS,
+        ...(path === '/swagger' || path === '/student/swagger.html'
+          ? {
+              'Content-Security-Policy': SECURITY_HEADERS['Content-Security-Policy'].replace(
+                "style-src 'self'",
+                "style-src 'self' 'unsafe-inline'",
+              ),
+            }
+          : {}),
       });
       response.end(request.method === 'HEAD' ? undefined : bytes);
     } catch (error) {

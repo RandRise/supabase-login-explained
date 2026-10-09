@@ -1,0 +1,95 @@
+body {
+  margin: 0;
+  background: #fafcfb;
+  font-family: system-ui, sans-serif;
+  color: #233d30;
+}
+header {
+  max-width: 1380px;
+  margin: auto;
+  padding: 28px 24px;
+}
+header a {
+  color: #2b674b;
+}
+h1 {
+  margin: 16px 0 6px;
+  font-size: 30px;
+}
+header p {
+  font-size: 14px;
+  color: #596d60;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+button {
+  cursor: pointer;
+}
+header button {
+  padding: 11px 16px;
+  border-radius: 7px;
+  border: 1px solid #b6cbbc;
+  background: white;
+  color: #234f3c;
+  font-weight: 650;
+}
+header button:first-child {
+  background: #23503b;
+  color: white;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #edf2ee;
+  padding: 15px;
+  border-radius: 8px;
+}
+details {
+  font-size: 13px;
+}
+summary {
+  cursor: pointer;
+}
+.swagger-ui .info {
+  margin: 24px 0;
+}
+.swagger-ui .wrapper {
+  padding: 0 24px;
+}
+.swagger-ui .scheme-container {
+  background: #f0f5f1;
+}
+.swagger-ui .curl-command {
+  display: none;
+}
+.swagger-ui .download-contents {
+  display: none;
+}
+.swagger-ui .opblock-summary-path {
+  overflow-wrap: anywhere;
+}
+.swagger-ui .opblock-summary {
+  flex-wrap: wrap;
+}
+@media (max-width: 550px) {
+  header {
+    padding: 20px 16px;
+  }
+  .swagger-ui .wrapper {
+    padding: 0 12px;
+  }
+  .swagger-ui .opblock .opblock-summary-path {
+    font-size: 12px;
+    max-width: 75%;
+  }
+  .swagger-ui table thead tr th {
+    font-size: 12px;
+  }
+  .swagger-ui .opblock-body {
+    overflow: auto;
+  }
+}

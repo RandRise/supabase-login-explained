@@ -1,6 +1,6 @@
-# Private Notes: login explained
+# Student Portal: login explained
 
-A small Alice/Bob messaging app with real Supabase Auth and Postgres row level security. Alice sends Bob a note; Bob signs in to read it and reply. Only the recipient can read a stored message.
+A small student quiz with real Supabase Auth, server-calculated scores, private results, and a local Swagger UI explorer. Alice and Bob sign in separately. A valid Alice token can access Alice's result; it cannot access Bob's.
 
 ## Run
 
@@ -12,50 +12,55 @@ cd supabase-login-explained/login-demo
 npm start
 ```
 
-Open http://127.0.0.1:8772. No npm install is required. The Windows preview currently uses port 8773.
+Open http://127.0.0.1:8772. Swagger is at http://127.0.0.1:8772/swagger. No npm install is required. The current Windows preview uses port 8773.
 
-On a fresh clone, import the original laptop's **public connection settings** using Connection settings → Import settings. The shareable ZIP includes those public settings and connects automatically. Each laptop signs in separately.
+The prepared shareable ZIP includes public connection settings. For a GitHub clone, use **Connection → Import settings** with the public settings exported from the original laptop, or enter the project URL and publishable key. Each laptop signs in separately.
 
-See [Mac setup](login-demo/MAC-SETUP.txt), [first setup](login-demo/START-HERE.txt), [presentation flow](login-demo/PRESENTATION.txt), and [built-in API playground](login-demo/API-PLAYGROUND.txt).
+- [Mac setup](login-demo/MAC-SETUP.txt)
+- [First setup](login-demo/START-HERE.txt)
+- [Presentation sequence](login-demo/PRESENTATION.txt)
+- [Swagger walkthrough](login-demo/SWAGGER.txt)
+- [Task coverage](login-demo/TASK-COVERAGE.txt)
+- [Actual validation results](login-demo/VALIDATION.txt)
 
 ## What to show
 
-1. Alice signs in and sends a note to Bob.
-2. Sign out. Bob signs in, reads it and uses Reply.
-3. Sign out. Alice signs in and receives Bob's reply.
-4. In API playground: no token → 401; Bob token → Bob inbox; Alice token → Alice inbox.
-5. Read Bob's known existing messages directly with Alice's token → 200 and an empty array. Try forging Bob's sender identity → 403.
-6. In browser DevTools, find the saved session and decode only the JWT claims. Reload the page to demonstrate session restoration.
-7. Explain that a copied bearer token can read/send as its owner without the password. Google sign-in is covered by a teammate. No separate API testing app is required.
+1. As a guest, read the public questions. Click View my result: the real API returns 401.
+2. Sign in as Alice, answer the quiz, submit, and see the server-calculated score.
+3. Reload: the saved session is reused without asking for the password.
+4. In Swagger, use Alice's session and read her result. Remove the bearer and repeat: 401.
+5. Sign in as Bob and submit a different result. Alice asking for Bob's result gets 403.
+6. Keep a copied Alice bearer in the Swagger tab, sign out of the portal, then repeat a request. An unexpired bearer can still act as Alice.
+7. Inspect the saved session in DevTools and decode claims locally. Decoding is not signature verification.
 
-[Task coverage](login-demo/TASK-COVERAGE.txt) separates what we observe from what we explain. [Validation](login-demo/VALIDATION.txt) records actual live-provider checks separately from fixture tests.
+## Code layout
 
-## Layout
+The current exercise lives in `login-demo/student/`.
 
 - `app.js`: startup and event wiring.
-- `js/constants.js`: storage keys, API paths and limits.
-- `js/api.js`: HTTP client shared by the page and live checks.
-- `js/auth.js`: login/logout and local session storage.
-- `js/messaging.js`: fetch inbox, load contacts and send notes.
-- `js/playground.js`: in-page API client with masked token input and real responses.
-- `js/playground-request.js`: pure request builder, redacted preview and response descriptions.
-- `js/ui.js`: safe text rendering and page controls.
-- `js/settings.js`: public connection import/export.
-- `js/state.js`: browser state and project-scoped restoration.
-- `core.mjs`: pure JWT/config helpers and earlier report verification helpers.
-- `server.mjs` / `server-config.mjs`: explicit static files only.
-- `add-messaging.sql`: additive contacts/messages schema, grants, RLS and invoker RPCs.
-- `postman-collection.json` / `postman-environment.template.json`: requests with empty credential variables.
+- `js/constants.js`: storage keys, endpoint paths and request timeout.
+- `js/state.js`: project-scoped session storage and app state.
+- `js/api.js`: HTTP requests to Supabase.
+- `js/auth.js`: sign in and sign out.
+- `js/quiz.js`: load questions, submit answers, fetch results.
+- `js/ui.js`: DOM rendering and response display.
+- `js/settings.js`: public configuration import/export.
+- `js/openapi.js`: OpenAPI 3 definition for the real endpoints.
+- `swagger.js`: Swagger initialization and bearer controls.
+- `base.css`: responsive portal styles; `swagger.css`: API explorer styles.
+- `vendor/`: pinned Swagger UI 5.33.1 distribution and licenses.
 
-The earlier report SQL and source files remain for reference; the new page does not import their controls. The complete earlier report demo is preserved in `login-demo/legacy-report/`. Other course exercises remain untouched.
+`add-student-quiz.sql` adds two tables with RLS and three SECURITY INVOKER functions. The score is a PostgreSQL generated column. The API accepts answers, not a caller-selected score or owner.
+
+The Node server serves files only. Login, token verification, scoring and authorization happen at Supabase. Existing messaging remains at `/messaging`; the complete earlier report exercise remains in `legacy-report/`. Historical Postman files apply to the messaging exercise, not the student quiz.
 
 ## Scope
 
-This is a test app, not an end-to-end encrypted messenger. Supabase stores the messages; project administrators can access them. A verified token determines whose inbox is queried. There is no caller-selected inbox owner and no outbox. The inbox returns the latest 100 notes.
+This is a teaching quiz with invented users, not a secure examination platform. The answer key is visible in the public SQL source. Students can make repeated submissions; their latest score is shown. The exercise demonstrates who may read or write which rows, not anti-cheating controls.
 
-The page stores its token pair in localStorage and clears the password field after login. This makes storage easy to demonstrate; it is not a recommendation for every production app. It restores sessions on reload and requires signing in again when the access token expires. The historical external Postman collection is optional; the presentation uses the built-in client.
+The page stores the token pair in localStorage for inspection, but never saves the password. It restores the session on reload and requires signing in again after access-token expiry; automatic refresh is intentionally not implemented. Swagger keeps a separate token copy in memory, with persistent authorization disabled.
 
-Only public URL/key settings are shareable. Passwords, JWTs, refresh tokens and browser-storage dumps never belong in the repository or ZIP.
+Only public URL/key settings belong in a handoff. Passwords, access/refresh tokens and browser-storage dumps must not be committed or included in the ZIP. Google sign-in is covered by a teammate.
 
 ## Checks
 
@@ -64,4 +69,4 @@ cd login-demo
 npm test
 ```
 
-Node checks exercise the static server, JWT decoder and configuration safety. They do not prove live-provider authorization. Live Supabase, local PostgreSQL and fixture DOM results are reported separately in VALIDATION.txt.
+These dependency-free checks do not log in to Supabase. Live-provider, local PostgreSQL, and fixture DOM checks are recorded separately in VALIDATION.txt.

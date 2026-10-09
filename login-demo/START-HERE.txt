@@ -1,36 +1,40 @@
-PRIVATE NOTES — START HERE
+STUDENT PORTAL — START HERE
 
-OUR EXISTING PROJECT IS READY
-Both invented users and the messaging schema are already configured.
-Do not rerun add-messaging.sql, setup.sql or add-report-action.sql here.
+EXISTING TEAM PROJECT
+The student schema is already installed in the dedicated login-explained-demo
+Supabase project. Alice and Bob already exist. Do not rerun the SQL on that project.
 
-1. Open Terminal in login-demo and run npm start (or node server.mjs).
-   Node.js 20 or newer. No npm install needed.
-2. Open http://127.0.0.1:8772. The current Windows preview is on port 8773.
-3. If needed, Connection settings > Import settings:
-   choose inbox-connection.public.json exported from the original laptop.
-   Older public-settings files still work.
-4. Sign in as alice@test.invalid using the invented demo password provided
-   separately. Send a note to Bob.
-5. Sign out, sign in as bob@test.invalid, read the note, click Reply and send.
-6. Sign out and return to Alice to see the reply.
+1. Install Node.js 20 or newer.
+2. Extract the prepared ZIP.
+3. Open a terminal in the login-demo folder and run:
+   npm start
+4. Open http://127.0.0.1:8772.
+5. Sign in as alice@test.invalid or bob@test.invalid using your demo password.
+   Passwords are deliberately absent from the ZIP.
+6. Open API docs to use Swagger at /swagger.
 
-The provided ZIP includes connection.local.json (public URL/key only).
-A Git clone does not include it: import the exported public settings instead.
-An authenticated session is never transferred to a new laptop.
+The prepared ZIP includes only the public connection URL/key.
+A GitHub clone needs Connection > Import settings, or URL/key entered manually.
+See MAC-SETUP.txt and PRESENTATION.txt.
 
-ONLY IF YOU CREATE YOUR OWN SEPARATE TEST PROJECT
-1. Create a Supabase project. GitHub integration is not required.
+NEW, SEPARATE TEST PROJECT ONLY
+1. Create a Supabase test project.
 2. Authentication > Users > Add user > Create user:
-   alice@test.invalid and bob@test.invalid.
-   Use invented passwords and enable Auto Confirm User for both.
-3. SQL Editor > New query > paste add-messaging.sql > Run ONCE.
-   This creates two invented contacts, a messages table and access rules.
-   Existing tables/auth settings are not changed. If names already exist,
-   stop and check; do not delete or disable RLS.
-4. Connection settings: paste project URL and PUBLISHABLE browser key.
-   Save connection. The anonymous inbox check should receive 401.
-5. Sign in and rehearse. Empty inboxes are normal until a note is sent.
+   alice@test.invalid and bob@test.invalid, invented passwords, Auto Confirm.
+3. Run add-student-quiz.sql ONCE in that project's SQL Editor, after users exist.
+   The SQL adds its own quiz tables/functions; earlier exercises are not required.
+4. Enter the project URL and publishable key in Connection.
+   Never use a secret or service_role key.
+5. Test both users and the missing-token case before presenting.
 
-API playground is built into the page to show requests with/without a token.
-No separate Postman app required. Read API-PLAYGROUND.txt and PRESENTATION.txt. TASK-COVERAGE.txt checks the assignment.
+No GitHub-to-Supabase integration is required. GitHub stores the code; Supabase
+provides Auth and the database; the local Node process serves static files.
+
+STARTUP PROBLEMS
+Port busy: close the old server terminal, or choose another port.
+macOS: PORT=8773 npm start
+PowerShell: $env:PORT='8773'; npm start
+Connect to the port printed by the server. Do not open index.html via file://.
+Missing function / HTTP 404: check the project and schema installation.
+Network error / no HTTP response: check internet or a paused Supabase project.
+HTTP 401 after a long pause: sign out, sign in again, then reattach in Swagger.

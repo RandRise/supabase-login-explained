@@ -1,0 +1,5 @@
+swagger-ui-dist 5.33.1
+Source: npm registry swagger-ui-dist@5.33.1
+Tarball integrity: sha512-H872wWkA53bFIsGgi7OWgmq+CRWw3nFQGdJWRqOB9wNwTm6e5ol34+qPDkV4AJlK+gglM2EsJiOOzsGsEGbluA==
+Vendored unchanged: swagger-ui-bundle.js, swagger-ui.css, licenses.
+No runtime CDN requests.

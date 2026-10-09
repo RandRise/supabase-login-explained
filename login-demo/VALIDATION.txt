@@ -1,3 +1,60 @@
+STUDENT QUIZ REVISION — 9 OCTOBER 2026
+
+ACTUAL LIVE SUPABASE TESTS: 18 passed
+Dedicated login-explained-demo project; invented Alice/Bob accounts only.
+- Both password logins returned 200.
+- Public quiz with only the project key returned three questions.
+- No bearer: result and submission RPCs returned 401.
+- Alice submitted correct answers: score 3/3 assigned to Alice.
+- Bob submitted different answers: score 0/3 assigned to Bob.
+- Both read their own results; Bob baseline confirmed before cross-owner test.
+- Alice requesting Bob's result RPC returned 403.
+- Alice querying Bob's rows directly returned 200 with [].
+- Forged Bob owner on an Alice insert returned 403.
+- Client-supplied score rejected: 400, SQLSTATE 428C9 (generated column).
+- Invalid answer array rejected: 400.
+- JWT sub edited while retaining signature rejected: 401.
+- Alice local signout returned 204.
+- Copied unexpired Alice bearer still read her result and submitted as Alice.
+  These are observed provider responses, not simulated UI messages.
+
+LOCAL / FIXTURE VERIFICATION
+- 23 local PostgreSQL checks: migration, grants, RLS, invoker functions,
+  anonymous denial, per-owner isolation, generated grading, forbidden writes,
+  unrelated role denied, invalid/null/empty/multidimensional answer arrays.
+  PGlite uses fixture auth.uid(); this does not validate JWT cryptography.
+- 35 student DOM checks: real app modules with fixture HTTP, sign-in/out,
+  password clearing, server-result rendering, no score submitted by client,
+  storage restoration, cross-account clearing, network failure and late-response
+  guard after another tab changes the session, public-settings import/export,
+  rejection of secret keys and token-bearing settings files.
+- 21 checks using the actual packaged Swagger bundle in jsdom: rendering five
+  operations, public key setup, bearer attach/remove, retained in-memory copy,
+  claims preview, disabled auth persistence/remote validator, clear responses,
+  and real Swagger Try it out/Execute request construction with/without bearer.
+  HTTP was intercepted with fixture responses; this was not a graphical browser.
+- npm test: 102 static-server/helpers checks and 16 student API/OpenAPI checks.
+  The preserved messaging exercise also passed its 71 fixture DOM checks. Neither uses passwords or real provider sessions.
+
+LIMITS / HANDOFF
+- Browser automation failed at startup, so no final screenshot or viewport
+  rendering check was possible. Responsive CSS includes 800px and 540px layouts.
+  Actual browser/macOS rehearsal remains necessary.
+- No timed natural-expiry test or automatic token refresh in this version.
+- Provider password hashing is documented, not observed via stored hash access.
+- Google OAuth remains the teammate's part, not a live feature.
+- Earlier report/messaging code, routes, tables and policies are preserved.
+- New schema is additive; no shared security settings changed.
+- Generated grade integrity does not make this an anti-cheating exam: the answer
+  key is public source and repeat submissions are intentionally allowed.
+- Security advisor: no new table/function notices; existing leaked-password
+  protection warning remains. No setting changed for the demo.
+  https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Live test submissions remain as invented quiz attempts; no data was deleted.
+
+PREVIOUS EXERCISE VALIDATION FOLLOWS
+============================================================
+
 VALIDATION — 8 OCTOBER 2026 / LOGIN PAGE + PROTECTED REPORT
 
 PASSED

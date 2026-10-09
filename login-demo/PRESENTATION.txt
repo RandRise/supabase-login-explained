@@ -1,79 +1,80 @@
-PRIVATE NOTES — ABOUT 5 MINUTES
+STUDENT PORTAL — ABOUT 5–6 MINUTES
 
-0:00 — ALICE
-Sign in as Alice. Send Bob a note:
-Subject: Presentation rehearsal
-Body: Hi Bob, shall we rehearse at 10:00?
+BEFORE SCREEN SHARING
+Open the portal and /swagger in two tabs on the same host/port.
+Sign in as Bob once, submit different answers, then sign out. This gives Bob
+a real result for the ownership test. Keep both invented passwords nearby.
+Swagger starts without a bearer token. No speaking notes are built into the app.
 
-Say: "Supabase checks the password and returns a session. The page attaches
-the access token when it asks the API to send this note. Supabase determines
-the sender from the token, so the form cannot simply choose to be Bob."
+1. GUEST — 30 SECONDS
+Show the quiz questions. Click View my result while signed out.
+Open Last data request: real HTTP 401.
 
-0:45 — BOB
-Sign out. Sign in as Bob. Read Alice's note, click Reply and send:
-"Hi Alice, yes. See you at 10:00."
+Say: "The questions are public. Results are private. The server needs a valid
+student token before it will return a result."
 
-Say: "Bob's token opens Bob's inbox. A valid Alice token opens Alice's inbox,
-not Bob's. Authentication tells us who you are; RLS restricts the rows you
-are allowed to read."
+2. ALICE LOGS IN AND TAKES THE QUIZ — 60 SECONDS
+Sign in as Alice. Choose answers and click Submit answers.
+Correct choices: browser localStorage; authenticated user; decoding is not
+verification. The request sends answer numbers, not a score.
 
-1:30 — ALICE'S REPLY
-Sign out, sign in as Alice and read the reply. Reload the page.
+Say: "The password goes over HTTPS to Supabase Auth. Supabase checks it and
+returns a session. Later requests use an access token instead of resending
+the password. The database calculates this score and assigns it to Alice."
 
-Say: "This page restores its saved session from localStorage. It sends the
-token again and the server still checks access. It does not save the password."
+Explain, rather than claim to observe: Supabase stores salted bcrypt password
+hashes. Our page clears its password field; a browser password manager is
+separate and may offer to save the password.
 
-2:00 — FIND AND DECODE THE TOKEN
-Chrome DevTools > Application > Local Storage > this site.
-Select team3-supabase-session-v1. Identify access_token, refresh_token and user.
-In DevTools Console, run these lines (no external JWT-decoding website needed):
+3. RELOAD AND INSPECT STORAGE — 45 SECONDS
+Reload the portal. Alice remains signed in and her result is fetched again.
+In Chrome DevTools: Application > Local Storage > this site's origin.
+Find team3-student-session-v1: access_token, refresh_token, user and scope.
+Do not copy the entire storage record into slides or Discord.
 
-const demoSession = JSON.parse(localStorage.getItem('team3-supabase-session-v1'));
-const demoCore = await import('/core.mjs');
-const demoClaims = demoCore.decode(demoSession.access_token).payload;
-console.table({ user: demoClaims.sub, email: demoClaims.email, role: demoClaims.role,
-  expires: new Date(demoClaims.exp * 1000).toISOString() });
+Say: "The page remembers the session in this browser. The access token is
+sent again, and the server checks it again. This app requires another login
+when the access token expires; automatic refresh isn't part of this demo."
 
-Say: "These are readable claims, not the password. Decoding does not verify
-the signature. Supabase verifies the token before the request reaches RLS."
-Keep the full credential out of shared notes/recordings.
+4. SWAGGER: THE SAME CALL WITH AND WITHOUT A TOKEN — 60 SECONDS
+Switch to Swagger. Click Use portal session.
+Expand POST /rest/v1/rpc/team3_get_result > Try it out > Execute.
+Keep {"p_student_id": null}. See HTTP 200 with Alice's actual result.
+Click Remove bearer token, then Execute again. See HTTP 401.
+Click Use portal session again.
 
-3:00 — BUILT-IN API PLAYGROUND
-No separate Postman app needed. Follow API-PLAYGROUND.txt.
-Open API playground, leave Attach bearer token unchecked, Read my inbox:
-show the missing Authorization header and the actual HTTP 401.
-Sign in as Bob, click Use signed-in token, repeat: show HTTP 200 and Bob's inbox.
-Uncheck the token and repeat the SAME request: 401 again.
-Say: "The token is the credential on this request. The server decides what
-this identity may read. The local Node server is only serving the page."
+Expand Decoded token claims. Point out sub, email, role and expires_at.
+Say: "This reads the token's claims locally. Readable doesn't mean trusted.
+Supabase verifies the signature and validity when the request arrives."
 
-4:00 — TOKEN THEFT / ACCESS BOUNDARY
-Sign in as Alice, Use signed-in token, then sign out on the normal page.
-The page inbox clears, but the masked token attached in the panel remains.
-Read my inbox may still return Alice's notes until JWT expiry.
-Optionally send another harmless invented note to Bob through the panel.
-Say: "Someone with this bearer token can act as Alice without her password.
-Signing out clears the browser session and revokes its refresh capability;
-it does not erase an access-token copy already held elsewhere."
+5. ALICE CANNOT BECOME BOB — 45 SECONDS
+In Swagger, execute GET /rest/v1/team3_quiz_students and copy Bob's invented
+UUID. In the result request, replace null with Bob's quoted UUID and Execute.
+See HTTP 403. Restore null afterwards.
 
-Optional: Read a selected person's inbox > Bob, with Alice token: 200 [].
-First show Bob can read a known existing note with Bob's token.
-Try sending as another person > Claimed sender Bob > To Alice, with Alice
-token: 403. These are separate database permissions, not just login status.
-Clear token when finished. The panel never prints or exports the credential.
+Say: "Alice has a valid token, but it represents Alice. Being logged in isn't
+permission to read every student's result."
 
-4:45 — HANDOFF
-"My teammate will explain Google sign-in. This demo covers password login,
-session storage and what the token permits."
+Optional deeper check: query /rest/v1/team3_quiz_attempts with
+student_id = eq.BOBS_UUID. Alice sees HTTP 200 with [] because RLS filters the
+rows. Bob's baseline must exist before describing this as an ownership check.
 
-PASSWORD EXPLANATION (DOCUMENTED, NOT A HASH-INSPECTION DEMO)
-The browser sends email/password directly to Supabase over HTTPS.
-Supabase stores salted bcrypt hashes and checks the supplied password.
-Hashing is not encryption that can be reversed to recover the password.
-The Node server here only serves files; it never processes login credentials.
+6. A COPIED TOKEN — 45 SECONDS
+Keep Alice's bearer attached in Swagger. Sign out of the portal.
+Return to Swagger without reloading and execute the own-result request.
+A still-valid copied bearer can return Alice's result. It can also submit
+another attempt as Alice through the quiz endpoint.
 
-DO NOT OVERCLAIM
-This is not end-to-end encrypted messaging. A project administrator can read
-the database. The copied token may also allow other account actions exposed
-by the provider; the limits above concern this demo and the original password.
-We did not test natural expiry by waiting. Google OAuth is not implemented here.
+Say: "A stolen bearer token can act as its owner while it remains valid.
+Logging out clears our local session and revokes its refresh capability,
+but a previously issued access token can remain usable until it expires.
+It does not reveal Alice's password, make us Bob, or bypass database policies."
+
+Remove the bearer and clear responses when finished.
+
+HANDOFF
+Google sign-in is the teammate's section. Our app doesn't perform live OAuth.
+The provider-side password hashing is explained from official documentation,
+not observed by reading password hashes. No naturally expired token was timed
+during validation. Do not label an arbitrary 404 or network failure as an
+authentication success.

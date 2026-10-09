@@ -1,0 +1,20 @@
+The demo now has a small API playground built into the page. No Postman app needed.
+
+Alice and Bob can still sign in, exchange notes and reply normally.
+In API playground, choose Read my inbox or Send a note, then send the request
+with or without a bearer token. The page shows the real Supabase status and
+response, with the token masked.
+
+Quick demonstration: no token -> 401. Sign in as Bob, Use signed-in token,
+repeat -> 200 and Bob's inbox. Switch to Alice's token -> Alice's inbox.
+There are optional checks for reading another inbox and claiming another sender.
+
+Repo: https://github.com/RandRise/supabase-login-explained
+Run npm start from login-demo, open http://127.0.0.1:8772.
+The current Windows preview uses http://127.0.0.1:8773.
+Use the provided ZIP or import the original laptop's public connection settings
+on a Git clone. Sign in separately; passwords are provided separately.
+
+API-PLAYGROUND.txt has the browser-only steps. PRESENTATION.txt covers the
+walkthrough and TASK-COVERAGE.txt checks the assignment. Google stays with
+our teammate. No passwords or tokens are in the ZIP or repository.
